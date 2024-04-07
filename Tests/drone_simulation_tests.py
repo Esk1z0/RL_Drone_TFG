@@ -11,7 +11,7 @@ class MyTestCase(unittest.TestCase):
         try:
             drone = drone_simulation.Drone()
             print("Instancia del Drone Creada")
-            time.sleep(4)
+            time.sleep(5)
         except Exception as e:
             print(e)
             assert False
@@ -30,7 +30,7 @@ class MyTestCase(unittest.TestCase):
         print('conexion establecida')
         drone.end_simulation()
         print('simulacion cerrada')
-        time.sleep(4)
+        time.sleep(5)
         assert True
 
 
@@ -43,13 +43,34 @@ class MyTestCase(unittest.TestCase):
         try:
             print(drone.send_receive('{"ACTION":"TAKE_OFF", "PARAMS": ""};'))
             print("primer mensaje hecho")
+            time.sleep(2)
             print(drone.send_receive('{"ACTION":"LAND", "PARAMS": ""};'))
             print("segundo mensaje hecho")
+            time.sleep(2)
         except Exception as e:
             print(e)
             assert False
         drone.end_simulation()
-        time.sleep(4)
+        time.sleep(5)
+        assert True
+
+
+
+    def test_cycle_fix(self):
+        drone = drone_simulation.Drone()
+        while not drone.is_connected():
+            drone.try_connection()
+            time.sleep(0.1)
+        try:
+            print(drone.send_receive('{"ACTION":"GET_TIME", "PARAMS": ""};'))
+            time.sleep(2)
+            print(drone.send_receive('{"ACTION":"GET_TIME", "PARAMS": ""};'))
+            time.sleep(2)
+        except Exception as e:
+            print(e)
+            assert False
+        drone.end_simulation()
+        time.sleep(5)
         assert True
 
     def test_get_actions(self):
@@ -60,7 +81,7 @@ class MyTestCase(unittest.TestCase):
         except Exception as e:
             print(e)
             assert False
-        time.sleep(4)
+        time.sleep(5)
         assert True
 
 if __name__ == '__main__':

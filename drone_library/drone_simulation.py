@@ -80,5 +80,5 @@ class Drone:
         """
             Sends the signal to the simulation to end Webots
         """
-        self.sock.sendall('{"ACTION":"CLOSE_CONNECTION"};'.encode())
+        self.sock.sendall('{"ACTION":"CLOSE_CONNECTION", "PARAMS":""};'.encode())
         self.sock.close()
