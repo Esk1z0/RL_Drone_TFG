@@ -18,19 +18,23 @@ class Connection_Timeout(Exception):
 
 
 
-def take_off(message: str):
+def take_off(robot, message: str):
     return "taking off;"
 
-def land(message: str):
+def land(robot, message: str):
     return "landing;"
 
-def close_connection(message: str):
+def get_time(robot, message: str):
+    return str(robot.getTime())+";"
+
+def close_connection(robot, message: str):
     time.sleep(0.5)
-    return Connection_End
+    return "closing_connection;"
 
 FUNCTIONS = [
     take_off,
     land,
+    get_time,
     close_connection
 ]
 
