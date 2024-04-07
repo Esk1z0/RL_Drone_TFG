@@ -1,0 +1,57 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/UnevenTerrain.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/dji/mavic/protos/Mavic2Pro.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/apartment_structure/protos/Wall.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/tables/protos/Table.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.15396491382413066 0.027863325709965664 0.9876833705148167 2.3071294692079682
+  position 3.2945485491441344 -4.736784977522733 2.72043827287932
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+UnevenTerrain {
+  rotation 0 0 1 -1.5707953071795862
+  size 40 40 4
+  flatCenter TRUE
+  flatBounds TRUE
+}
+Table {
+  translation -0.96 0 -0.28
+}
+Wall {
+  translation -1.6 0 0.07
+}
+Wall {
+  translation -1.61 -2.29 0.07
+  name "wall(1)"
+}
+Mavic2Pro {
+  hidden position_0_0 5.838569137087477e-09
+  hidden position_7_0 1.0616899978036786e-08
+  hidden position_8_0 -4.893477865722004e-09
+  translation -1.1383 0.111002 1.09401
+  rotation 0.034956040523313976 0.0004942244369886401 0.9993887286602439 3.1249476376560903
+  controller "xyz_controller"
+  supervisor TRUE
+  bodySlot [
+    DistanceSensor {
+      translation 0.07 0 0
+      lookupTable [
+        0 0 0
+        4 1000 0
+      ]
+      type "sonar"
+    }
+    InertialUnit {
+      name "imu"
+    }
+  ]
+}
