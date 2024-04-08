@@ -84,5 +84,23 @@ class MyTestCase(unittest.TestCase):
         time.sleep(5)
         assert True
 
+    def test_get_image(self):
+        drone = drone_simulation.Drone()
+        while not drone.is_connected():
+            drone.try_connection()
+            time.sleep(0.1)
+        try:
+            start = time.monotonic()
+            print(drone.send_receive('{"ACTION":"GET_IMAGE", "PARAMS": ""};'))
+            end = time.monotonic()
+            print("time: " + str(end-start))
+            time.sleep(5)
+        except Exception as e:
+            print(e)
+            assert False
+        time.sleep(5)
+        assert True
+
+
 if __name__ == '__main__':
     unittest.main()

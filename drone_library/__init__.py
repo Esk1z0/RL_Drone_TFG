@@ -20,5 +20,6 @@ ACTIONS = [
     "TAKE_OFF",
     "LAND",
     "GET_TIME",
+    "GET_IMAGE",
     "CLOSE_CONNECTION"
 ]

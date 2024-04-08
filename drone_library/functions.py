@@ -28,7 +28,13 @@ def land(robot, devices, message: str):
 def get_time(robot, devices, message: str):
     return str(robot.getTime())+";"
 
+def get_image(robot, devices, message: str):
+    cam = devices.get("camera")
+    arr = cam.getImageArray()
+    arr_gray = [[sum(pixel) // 3 for pixel in row] for row in arr]
+    return str(arr_gray) + ";"
 
+    return str(arr) + ";"
 
 def close_connection(robot, devices, message: str):
     time.sleep(0.5)
@@ -38,6 +44,7 @@ FUNCTIONS = [
     take_off,
     land,
     get_time,
+    get_image,
     close_connection
 ]
 
