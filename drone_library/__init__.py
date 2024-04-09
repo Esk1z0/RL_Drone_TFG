@@ -2,6 +2,13 @@
 HOST = 'localhost'
 PORT = 12000
 TIME_OUT = 3
+
+REQUEST_M = "request_memory"
+RESPONSE_M = "response_memory"
+SEM_REQUEST_M = "sem_request_memory"
+SEM_RESPONSE_M = "sem_response_memory"
+SHM_SIZE = 1024
+
 TIME_STEP = 10
 SENSORS = ["camera", "inertial unit", "distance sensor"]
 ACTUATORS = ["front left propeller", "front right propeller",

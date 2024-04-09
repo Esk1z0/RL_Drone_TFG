@@ -31,14 +31,11 @@ def get_time(robot, devices, message: str):
 def get_image(robot, devices, message: str):
     cam = devices.get("camera")
     arr = cam.getImageArray()
-    arr_gray = [[sum(pixel) // 3 for pixel in row] for row in arr]
-    return str(arr_gray) + ";"
-
-    return str(arr) + ";"
+    return [[sum(pixel) // 3 for pixel in row] for row in arr]
 
 def close_connection(robot, devices, message: str):
     time.sleep(0.5)
-    return "closing_connection;"
+    return "closing_connection"
 
 FUNCTIONS = [
     take_off,

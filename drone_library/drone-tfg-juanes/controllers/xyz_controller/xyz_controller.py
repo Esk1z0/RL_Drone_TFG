@@ -1,15 +1,19 @@
 import sys
 import json
-import socket
+
 import threading
 import time
 from controller import Supervisor, Camera
-from drone_library import ACTIONS, PORT, HOST, TIME_OUT, TIME_STEP, ACTUATORS, SENSORS
+from drone_library import ACTIONS, PORT, HOST, TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, REQUEST_M, RESPONSE_M, \
+    SEM_REQUEST_M, SEM_RESPONSE_M, SHM_SIZE
 from drone_library.functions import FUNCTIONS, Connection_End, Connection_Timeout
+import mmap
+import pickle
+from Mmap_Semaphore import BinarySemaphore
 
 
 class DroneServer:
-    def __init__(self, port=PORT, host=HOST, time_out=TIME_OUT, time_step=TIME_STEP):
+    def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
         self.server_socket = None
         self.reception_running = False
 
@@ -17,86 +21,73 @@ class DroneServer:
         self.time_step = time_step
         self.time_out = time_out
 
-        self.host = host
-        self.port = port
-
         self.robot = Supervisor()
         self.devices = {}
 
-
+        self.emitter = mmap.mmap(-1, SHM_SIZE, RESPONSE_M)
+        self.receptor = mmap.mmap(-1, SHM_SIZE, REQUEST_M)
+        self.sem_emisor = BinarySemaphore(name=SEM_RESPONSE_M)
+        self.sem_receptor = BinarySemaphore(name=SEM_REQUEST_M)
 
         self.close_sim = False
         self.ACTIONS_CONVERT = dict(zip(ACTIONS, FUNCTIONS))
 
-
-    def start(self):
-        self.server_socket = self.initialize_API()
-        self.main_cycle()
-
-
     def main_cycle(self):
+        self.sem_emisor.release()
+        self.sem_receptor.release()
         try:
-            conn = self.receive_conn()
             while self.robot.step(self.time_step) != -1:
-                connection_action = threading.Thread(target=self.attend_message, args=[conn])
+                connection_action = threading.Thread(target=self.attend_message)
                 if not self.reception_running:
                     self.reception_running = True
                     connection_action.start()
-                if (((not self.time_out == 0) and (time.monotonic() - self.start_time) > self.time_out)) or self.close_sim:
+                if (
+                        ((not self.time_out == 0) and (
+                                time.monotonic() - self.start_time) > self.time_out)) or self.close_sim:
                     break
         except Exception as e:
             print(f'Error: {e}')
         finally:
-            if self.server_socket:
-                self.close_connection()
+            self.close_connection()
 
-    def attend_message(self, conn):
-        aux = self.receive_until_semicolon(conn)
-        if aux is not None:
+    def attend_message(self):
+        message = self.receive_data()
+        if message:
             self.start_time = time.monotonic()
-            message = json.loads(aux)
+
             print(message.get('ACTION'))
             func = self.ACTIONS_CONVERT.get(message['ACTION'])  # decodificación de la acción
             if func:
                 response = func(self.robot, self.devices, message['PARAMS'])  # ejecución de la acción y respuesta
-                conn.sendall(response.encode())
-                if response == "closing_connection;":
-                    self.close_sim = True
+                self.close_sim = True
+                if response or (not response == "closing_connection"):
+                    self.send_data(pickle.dumps(response))
+                    self.close_sim = False
             else:
                 print(f'Error: Función no encontrada para la acción {message["ACTION"]}')
         self.reception_running = False
 
-    def initialize_API(self):
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.bind((self.host, self.port))
-        server_socket.listen(1)
-        if(not self.time_out == 0):
-            server_socket.settimeout(self.time_out)
-        print("Servidor socket iniciado en {}:{}".format(self.host, self.port))
-        return server_socket
+    def receive_data(self):
+        data_received = b''
+        while True:
+            self.sem_receptor.acquire()
+            chunk = self.receptor.read()
+            data_received += chunk
+            if not chunk:
+                break
+            self.sem_receptor.release()
+        if data_received:
+            return pickle.loads(data_received)
+        else:
+            return None
 
-    def receive_conn(self) -> (socket.socket, float):
-        conn, addr = self.server_socket.accept()
-        print("Nueva conexión entrante desde:", addr)
-        self.start_time = time.monotonic()
-        return conn
-
-    def receive_until_semicolon(self, conn):
-        try:
-            data_received = b''  # Inicializamos una variable para almacenar los datos recibidos
-            while True:
-                chunk = conn.recv(1024)  # Recibimos datos del socket en bloques de 1024 bytes
-                if not chunk:
-                    break  # Si no hay más datos para recibir, salimos del bucle
-                data_received += chunk
-                if b';' in chunk:
-                    break  # Si encontramos un punto y coma en los datos recibidos, salimos del bucle
-
-            value = data_received.decode()
-            value = value.replace(';', ' ')
-            return value
-        except socket.timeout:
-            raise Exception("Se ha producido un tiempo de espera durante la recepción de datos.")
+    def send_data(self, data):
+        for i in range(0, len(data), SHM_SIZE):
+            chunk = data[i:i + SHM_SIZE]
+            self.sem_emisor.acquire()
+            self.emitter.seek(0)  # Asegurarse de que estamos al principio de la memoria compartida
+            self.emitter.write(chunk)
+            self.sem_emisor.release()
 
     def enable_everything(self):
         for i in SENSORS:
@@ -108,9 +99,8 @@ class DroneServer:
             self.devices.update({j: device})
 
     def close_connection(self):
-        if self.server_socket:
-            self.server_socket.close()
-            print("Cerrando Simulación")
+        self.receptor.close()
+        self.emitter.close()
 
     def end_simulation(self):
         self.robot.simulationQuit(0)
@@ -121,7 +111,7 @@ if __name__ == '__main__':
         print(sys.version)
         server = DroneServer()
         server.enable_everything()
-        server.start()
+        server.main_cycle()
         server.end_simulation()
     except Exception as e:
         print(e)

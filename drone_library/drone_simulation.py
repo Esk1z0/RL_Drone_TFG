@@ -2,8 +2,11 @@ import threading
 import subprocess
 import socket
 import warnings
+import mmap
+import pickle
 
 from . import *
+from Mmap_Semaphore import BinarySemaphore
 
 
 def initialize_instance() -> None:
@@ -16,26 +19,13 @@ def initialize_instance() -> None:
 
 class Drone:
     def __init__(self):
-        warnings.filterwarnings(action="ignore", message="unclosed", category=ResourceWarning)
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sim_up = False
-        self.connected = False
+        self.receptor = mmap.mmap(-1, SHM_SIZE, RESPONSE_M)
+        self.emitter = mmap.mmap(-1, SHM_SIZE, REQUEST_M)
+        self.sem_receptor = BinarySemaphore(name=SEM_RESPONSE_M)
+        self.sem_emitter = BinarySemaphore(name=SEM_RESPONSE_M)
         thread = threading.Thread(target=initialize_instance)
         thread.start()
-
-    def try_connection(self) -> None:
-        """
-            Try to connect to the simulator socket through the HOST and PORT selected
-        """
-        try:
-            self.sock.connect((HOST, PORT))
-            self.connected = True
-        except Exception as e:
-            print("Error al conectar " + f'Error: {e}')
-            self.connected = False
-
-    def is_connected(self):
-        return self.connected
 
     def send_receive(self, message: str):
         """
@@ -46,29 +36,35 @@ class Drone:
             Returns:
                 str: The Response from the simulator socket
         """
-        self.send(message)
+        self.send(pickle.dumps(message))
         return self.receive()
 
-
-
-    def send(self, message: str) -> None:
+    def send(self, data) -> None:
         """
             Sends the message to the simulator through the socket
             Args:
             essage (str): A json transformable string with a ';' at the end
         """
-        self.sock.sendall(message.encode())
+        for i in range(0, len(data), SHM_SIZE):
+            chunk = data[i:i + SHM_SIZE]
+            self.sem_emitter.acquire()
+            self.emitter.seek(0)  # Asegurarse de que estamos al principio de la memoria compartida
+            self.emitter.write(chunk)
+            self.sem_emitter.release()
 
     def receive(self):
-        buffer = b''
+        data_received = b''
         while True:
-            datos_recibidos = self.sock.recv(1024)
-            buffer += datos_recibidos
-            if b';' in buffer:
+            self.sem_receptor.acquire()
+            chunk = self.receptor.read()
+            data_received += chunk
+            if not chunk:
                 break
-        value = buffer.decode()
-        value = value.replace(';', ' ')
-        return value
+            self.sem_receptor.release()
+        if data_received:
+            return pickle.loads(data_received)
+        else:
+            return None
 
     def get_actions(self) -> list[str]:
         """
@@ -80,5 +76,6 @@ class Drone:
         """
             Sends the signal to the simulation to end Webots
         """
-        self.sock.sendall('{"ACTION":"CLOSE_CONNECTION", "PARAMS":""};'.encode())
-        self.sock.close()
+        self.send(pickle.dumps({"ACTIONS": "closing_connection", "PARAMS": ""}))
+        self.emitter.close()
+        self.receptor.close()
