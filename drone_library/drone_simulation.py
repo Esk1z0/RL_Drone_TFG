@@ -23,20 +23,21 @@ class Drone:
         self.receptor = mmap.mmap(-1, SHM_SIZE, RESPONSE_M)
         self.emitter = mmap.mmap(-1, SHM_SIZE, REQUEST_M)
         self.sem_receptor = BinarySemaphore(name=SEM_RESPONSE_M)
-        self.sem_emitter = BinarySemaphore(name=SEM_RESPONSE_M)
+        self.sem_emitter = BinarySemaphore(name=SEM_REQUEST_M)
         thread = threading.Thread(target=initialize_instance)
         thread.start()
 
-    def send_receive(self, message: str):
+    def send_receive(self, message: object):
         """
             Sends the message to the simulator through the socket and returns what was
             returned by the simulator
             Args:
-                message (str): A json transformable string with a ';' at the end
+                message (object): A json transformable string with a ';' at the end
             Returns:
                 str: The Response from the simulator socket
         """
         self.send(pickle.dumps(message))
+        print('hola')
         return self.receive()
 
     def send(self, data) -> None:
@@ -46,11 +47,17 @@ class Drone:
             essage (str): A json transformable string with a ';' at the end
         """
         for i in range(0, len(data), SHM_SIZE):
+            print('gol')
             chunk = data[i:i + SHM_SIZE]
-            self.sem_emitter.acquire()
+            print(chunk)
+            while not self.sem_emitter.is_write_open():
+                pass
+            print('golgol')
             self.emitter.seek(0)  # Asegurarse de que estamos al principio de la memoria compartida
             self.emitter.write(chunk)
-            self.sem_emitter.release()
+            self.emitter.flush()
+
+            self.sem_emitter.read_open()
 
     def receive(self):
         data_received = b''

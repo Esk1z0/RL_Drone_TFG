@@ -59,10 +59,11 @@ class DroneServer:
             func = self.ACTIONS_CONVERT.get(message['ACTION'])  # decodificación de la acción
             if func:
                 response = func(self.robot, self.devices, message['PARAMS'])  # ejecución de la acción y respuesta
-                self.close_sim = True
                 if response or (not response == "closing_connection"):
                     self.send_data(pickle.dumps(response))
                     self.close_sim = False
+                else:
+                    self.close_sim = True
             else:
                 print(f'Error: Función no encontrada para la acción {message["ACTION"]}')
         self.reception_running = False
@@ -70,12 +71,15 @@ class DroneServer:
     def receive_data(self):
         data_received = b''
         while True:
-            self.sem_receptor.acquire()
+            while not self.sem_receptor.is_read_open():
+                pass
+            self.receptor.seek(0)
             chunk = self.receptor.read()
+            print(chunk)
             data_received += chunk
             if not chunk:
                 break
-            self.sem_receptor.release()
+            self.sem_receptor.write_open()
         if data_received:
             return pickle.loads(data_received)
         else:
@@ -87,6 +91,7 @@ class DroneServer:
             self.sem_emisor.acquire()
             self.emitter.seek(0)  # Asegurarse de que estamos al principio de la memoria compartida
             self.emitter.write(chunk)
+            self.emitter.flush()
             self.sem_emisor.release()
 
     def enable_everything(self):
@@ -107,12 +112,12 @@ class DroneServer:
 
 
 if __name__ == '__main__':
+    server = DroneServer()
     try:
         print(sys.version)
-        server = DroneServer()
         server.enable_everything()
         server.main_cycle()
-        server.end_simulation()
     except Exception as e:
         print(e)
+    finally:
         server.end_simulation()

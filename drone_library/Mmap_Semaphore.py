@@ -2,7 +2,7 @@ import mmap
 
 
 class BinarySemaphore:
-    def __init__(self, initial_value=False, name="shared_memory"):
+    def __init__(self, initial_value=True, name="shared_memory"):
         self._map_memory(name)
         self._initialize(initial_value)
 
@@ -12,20 +12,29 @@ class BinarySemaphore:
     def _initialize(self, initial_value):
         self.value = initial_value
         self.mem.seek(0)
-        self.mem.write(b'\x01' if initial_value else b'\x00')
-
-    def acquire(self):
-        while True:
+        val = self.mem.read()
+        if not (val == b'0' or val == b'1'):
             self.mem.seek(0)
-            value = self.mem.read_byte()
-            if value == b'\x01':
-                self.mem.seek(0)
-                self.mem.write(b'\x00')
-                return True
+            self.mem.write(b'1' if initial_value else b'0')
+            self.mem.flush()
 
-    def release(self):
+    def read_open(self):
         self.mem.seek(0)
-        self.mem.write(b'\x01')
+        self.mem.write(b'0')
+        self.mem.flush()
+
+    def write_open(self):
+        self.mem.seek(0)
+        self.mem.write(b'1')
+        self.mem.flush()
+
+    def is_read_open(self):
+        self.mem.seek(0)
+        return self.mem.read(1) == b'0'
+
+    def is_write_open(self):
+        self.mem.seek(0)
+        return (self.mem.read(1) == b'1')
 
     def __del__(self):
         self.mem.close()
