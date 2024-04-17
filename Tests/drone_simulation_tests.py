@@ -5,8 +5,14 @@ import time
 
 
 class MyTestCase(unittest.TestCase):
-    # def test_something(self):
-    #    self.assertEqual(True, False)  # add assertion here
+    def test_something(self):
+        cadena_bytes = b'444\x00\x00\x00\x00\x00\x00\x00'
+        cadena_limpia = cadena_bytes.replace(b'\x00', b'')  # Eliminar los bytes nulos
+        cadena_texto = cadena_limpia.decode()  # Decodificar los bytes a una cadena de texto
+        numero = int(cadena_texto)  # Convertir la cadena de texto a un entero
+        print(numero)
+
+        self.assertEqual(True, True)  # add assertion here
 
     def test_constructor_initialize_instance(self):
         try:
@@ -30,7 +36,9 @@ class MyTestCase(unittest.TestCase):
         except Exception as e:
             print(e)
             assert False
+        print("ending")
         drone.end_simulation()
+        print("ended")
         time.sleep(5)
         assert True
 

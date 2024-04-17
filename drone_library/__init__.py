@@ -1,7 +1,7 @@
 #Constantes xyz_controller
 HOST = 'localhost'
 PORT = 12000
-TIME_OUT = 3
+TIME_OUT = 5
 
 REQUEST_M = "request_memory"
 RESPONSE_M = "response_memory"

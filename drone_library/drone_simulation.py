@@ -1,7 +1,6 @@
 import threading
 import subprocess
-import socket
-import warnings
+
 import mmap
 import pickle
 
@@ -9,12 +8,13 @@ from . import *
 from Mmap_Semaphore import BinarySemaphore
 
 
-def initialize_instance() -> None:
+def initialize_instance(event) -> None:
     """
         Activates the Webots World in mode realtime and activating the flags no-rendering and batch
     """
     proceso = subprocess.run(COMMAND, shell=True, capture_output=True, text=True)
     print('Salida Simulador: ' + str(proceso.returncode))
+    event.set()
 
 
 class Drone:
@@ -24,7 +24,8 @@ class Drone:
         self.emitter = mmap.mmap(-1, SHM_SIZE, REQUEST_M)
         self.sem_receptor = BinarySemaphore(name=SEM_RESPONSE_M)
         self.sem_emitter = BinarySemaphore(name=SEM_REQUEST_M)
-        thread = threading.Thread(target=initialize_instance)
+        self.sim_out = threading.Event()
+        thread = threading.Thread(target=initialize_instance, args=[self.sim_out])
         thread.start()
 
     def send_receive(self, message: object):
@@ -37,6 +38,7 @@ class Drone:
                 str: The Response from the simulator socket
         """
         self.send(pickle.dumps(message))
+        print(pickle.dumps(message))
         print('hola')
         return self.receive()
 
@@ -46,29 +48,41 @@ class Drone:
             Args:
             essage (str): A json transformable string with a ';' at the end
         """
+        while not self.sem_emitter.is_write_open():
+            if self.sim_out.is_set(): raise Exception("crashed")
+        self.send_emitter(b'\x00' * SHM_SIZE)
+        self.send_emitter(str(len(data)).encode())
+        self.sem_emitter.read_open()
         for i in range(0, len(data), SHM_SIZE):
-            print('gol')
-            chunk = data[i:i + SHM_SIZE]
-            print(chunk)
             while not self.sem_emitter.is_write_open():
-                pass
-            print('golgol')
-            self.emitter.seek(0)  # Asegurarse de que estamos al principio de la memoria compartida
-            self.emitter.write(chunk)
-            self.emitter.flush()
-
+                if self.sim_out.is_set(): raise Exception("crashed")
+            chunk = data[i:i + SHM_SIZE]
+            if len(chunk) < SHM_SIZE:
+                self.send_emitter(b'\x00' * SHM_SIZE)
+            self.send_emitter(chunk)
             self.sem_emitter.read_open()
 
     def receive(self):
         data_received = b''
-        while True:
-            self.sem_receptor.acquire()
+        while not self.sem_receptor.is_read_open():
+            if self.sim_out.is_set(): raise Exception("crashed")
+        self.receptor.seek(0)
+        length = self.receptor.read()
+        self.receptor.seek(0)
+        self.receptor.write(b'\x00' * SHM_SIZE)
+        self.sem_receptor.write_open()
+        for _ in range(0, int(length.replace(b'\x00', b'').decode()), SHM_SIZE):
+            while not self.sem_receptor.is_read_open():
+                if self.sim_out.is_set(): raise Exception("crashed")
+            self.receptor.seek(0)
             chunk = self.receptor.read()
             data_received += chunk
-            if not chunk:
-                break
-            self.sem_receptor.release()
+            self.sem_receptor.write_open()
+            # if chunk == b'\x00' * SHM_SIZE:
+            #    break
         if data_received:
+            # data_received.replace(b'\x00', b'')
+            print(data_received)
             return pickle.loads(data_received)
         else:
             return None
@@ -83,6 +97,20 @@ class Drone:
         """
             Sends the signal to the simulation to end Webots
         """
-        self.send(pickle.dumps({"ACTIONS": "closing_connection", "PARAMS": ""}))
+        self.send(pickle.dumps({"ACTION": "CLOSE_CONNECTION", "PARAMS": ""}))
         self.emitter.close()
         self.receptor.close()
+
+    def send_emitter(self, data: bytes):
+        self.emitter.seek(0)
+        self.emitter.write(data)
+        self.emitter.flush()
+
+    def receive_receptor(self):
+        self.receptor.seek(0)
+        return self.receptor.read()
+
+    def send_receptor(self, data: bytes):
+        self.receptor.seek(0)
+        self.receptor.write(data)
+        self.receptor.flush()

@@ -34,8 +34,8 @@ def get_image(robot, devices, message: str):
     return [[sum(pixel) // 3 for pixel in row] for row in arr]
 
 def close_connection(robot, devices, message: str):
-    time.sleep(0.5)
-    return "closing_connection"
+    robot.simulationQuit(0)
+    return "CLOSE_CONNECTION"
 
 FUNCTIONS = [
     take_off,
