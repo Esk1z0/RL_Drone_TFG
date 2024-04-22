@@ -17,7 +17,7 @@ ACTUATORS = ["front left propeller", "front right propeller",
 
 #Constantes Drone
 WORLD_DIR = " ..\drone_library\drone-tfg-juanes\worlds\my_frst_webots_world.wbt"
-MODE_FLAGS = " --no-rendering --batch --mode=realtime "#--minimize "
+MODE_FLAGS = " --batch --mode=realtime "#--no-rendering --minimize "
 EXECUTE = "webots "
 
 COMMAND = EXECUTE + MODE_FLAGS + WORLD_DIR
@@ -27,6 +27,7 @@ ACTIONS = [
     "TAKE_OFF",
     "LAND",
     "GET_TIME",
+    "GET_PRM",
     "GET_IMAGE",
     "CLOSE_CONNECTION"
 ]

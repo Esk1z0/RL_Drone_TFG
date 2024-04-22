@@ -38,7 +38,6 @@ class DroneServer:
                 connection_action = threading.Thread(target=self.attend_message)
                 if (not self.close_sim.is_set()) and (not self.reception_running):
                     self.reception_running = True
-                    print("attending message")
                     connection_action.start()
                 if ((not self.time_out == 0) and (time.monotonic() - self.start_time) > self.time_out) or self.close_sim.is_set():
                     break
@@ -56,6 +55,7 @@ class DroneServer:
             if func:
                 response = func(self.robot, self.devices, message['PARAMS'])  # ejecución de la acción y respuesta
                 if response:
+                    print('hola')
                     self.send_data(pickle.dumps(response))
                 if response == "CLOSE_CONNECTION":
                     print("fin")

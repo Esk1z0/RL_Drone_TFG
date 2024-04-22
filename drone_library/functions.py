@@ -20,18 +20,35 @@ class Connection_Timeout(Exception):
 
 
 def take_off(robot, devices, message: str):
-    return "taking off;"
+    return "taking off"
 
 def land(robot, devices, message: str):
-    return "landing;"
+    return "landing"
 
 def get_time(robot, devices, message: str):
-    return str(robot.getTime())+";"
+    return str(robot.getTime())
+
+def provisional_message(robot, devices, message: str):
+    return b"Lorem ipsum dolor sit amet, " \
+           b"consectetur adipiscing elit. Sed vel nisl non orci vehicula posuere. " \
+           b"Nullam auctor, leo ut bibendum pellentesque, libero ligula vulputate quam, " \
+           b"non bibendum lorem eros ac justo. Quisque sed tellus ullamcorper, " \
+           b"fermentum lacus non, consequat sem. Aliquam id arcu sit amet ligula cursus vehicula sit amet non ex." \
+           b" Duis scelerisque risus nec est congue, nec ullamcorper turpis volutpat. Nulla in tortor vel velit faucibus vehicula. " \
+           b"Maecenas sed bibendum lacus"
 
 def get_image(robot, devices, message: str):
-    cam = devices.get("camera")
-    arr = cam.getImageArray()
-    return [[sum(pixel) // 3 for pixel in row] for row in arr]
+    print('hola')
+    cam = devices["camera"]
+    print('hola 2'+ str(cam.getWidth()))
+    print('hola 2' + str(cam.getHeight()))
+    #cam.enable(10)
+
+    arr = cam.getImage()
+    print(arr)
+    print('hola 3:'+ str(type(arr)))
+    return arr
+    #return [[sum(pixel) // 3 for pixel in row] for row in arr]
 
 def close_connection(robot, devices, message: str):
     robot.simulationQuit(0)
@@ -41,6 +58,7 @@ FUNCTIONS = [
     take_off,
     land,
     get_time,
+    provisional_message,
     get_image,
     close_connection
 ]
