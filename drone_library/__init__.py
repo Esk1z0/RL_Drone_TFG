@@ -27,7 +27,9 @@ ACTIONS = [
     "TAKE_OFF",
     "LAND",
     "GET_TIME",
-    "GET_PRM",
+    "GET_IMU",
+    "GET_DISTANCE",
     "GET_IMAGE",
-    "CLOSE_CONNECTION"
+    "CLOSE_CONNECTION",
+    "GET_PRM"
 ]

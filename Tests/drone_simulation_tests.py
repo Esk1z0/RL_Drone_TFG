@@ -87,6 +87,37 @@ class MyTestCase(unittest.TestCase):
         time.sleep(5)
         assert True
 
+    def test_get_imu(self):
+        drone = drone_simulation.Drone()
+        time.sleep(5)
+        try:
+            start = time.monotonic()
+            x = drone.send_receive({"ACTION": "GET_IMU", "PARAMS": ""})
+            fin = time.monotonic()
+            print('tiempo ', str(fin - start))
+            print(x)
+            time.sleep(5)
+        except Exception as e:
+            print(e)
+            assert False
+        time.sleep(5)
+        assert True
+
+    def test_get_distance(self):
+        drone = drone_simulation.Drone()
+        time.sleep(7)
+        try:
+            start = time.monotonic()
+            x = drone.send_receive({"ACTION": "GET_DISTANCE", "PARAMS": ""})
+            fin = time.monotonic()
+            print('tiempo ', str(fin - start))
+            print(x)
+            time.sleep(5)
+        except Exception as e:
+            print(e)
+            assert False
+        time.sleep(5)
+        assert True
 
 if __name__ == '__main__':
     unittest.main()

@@ -28,14 +28,14 @@ def land(robot, devices, message: str):
 def get_time(robot, devices, message: str):
     return str(robot.getTime())
 
-def provisional_message(robot, devices, message: str):
-    return b"Lorem ipsum dolor sit amet, " \
-           b"consectetur adipiscing elit. Sed vel nisl non orci vehicula posuere. " \
-           b"Nullam auctor, leo ut bibendum pellentesque, libero ligula vulputate quam, " \
-           b"non bibendum lorem eros ac justo. Quisque sed tellus ullamcorper, " \
-           b"fermentum lacus non, consequat sem. Aliquam id arcu sit amet ligula cursus vehicula sit amet non ex." \
-           b" Duis scelerisque risus nec est congue, nec ullamcorper turpis volutpat. Nulla in tortor vel velit faucibus vehicula. " \
-           b"Maecenas sed bibendum lacus"
+def get_imu(robot, devices, message: str):
+    imu = devices["inertial unit"]
+    return imu.getQuaternion()
+
+
+def get_distance(robot, devices, message: str):
+    distance_sensor = devices["distance sensor"]
+    return distance_sensor.getValue()
 
 def get_image(robot, devices, message: str):
     cam = devices["camera"]
@@ -47,12 +47,24 @@ def close_connection(robot, devices, message: str):
     robot.simulationQuit(0)
     return "CLOSE_CONNECTION"
 
+
+def provisional_message(robot, devices, message: str):
+    return b"Lorem ipsum dolor sit amet, " \
+           b"consectetur adipiscing elit. Sed vel nisl non orci vehicula posuere. " \
+           b"Nullam auctor, leo ut bibendum pellentesque, libero ligula vulputate quam, " \
+           b"non bibendum lorem eros ac justo. Quisque sed tellus ullamcorper, " \
+           b"fermentum lacus non, consequat sem. Aliquam id arcu sit amet ligula cursus vehicula sit amet non ex." \
+           b" Duis scelerisque risus nec est congue, nec ullamcorper turpis volutpat. Nulla in tortor vel velit faucibus vehicula. " \
+           b"Maecenas sed bibendum lacus"
+
 FUNCTIONS = [
     take_off,
     land,
     get_time,
-    provisional_message,
+    get_imu,
+    get_distance,
     get_image,
-    close_connection
+    close_connection,
+    provisional_message
 ]
 
