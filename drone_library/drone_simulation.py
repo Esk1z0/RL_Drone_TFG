@@ -82,7 +82,7 @@ class Drone:
             #    break
         if data_received:
             # data_received.replace(b'\x00', b'')
-            print(data_received)
+            #print(data_received)
             return pickle.loads(data_received)
         else:
             return None

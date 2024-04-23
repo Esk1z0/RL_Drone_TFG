@@ -38,16 +38,9 @@ def provisional_message(robot, devices, message: str):
            b"Maecenas sed bibendum lacus"
 
 def get_image(robot, devices, message: str):
-    print('hola')
     cam = devices["camera"]
-    print('hola 2'+ str(cam.getWidth()))
-    print('hola 2' + str(cam.getHeight()))
-    #cam.enable(10)
+    return cam.getImage()
 
-    arr = cam.getImage()
-    print(arr)
-    print('hola 3:'+ str(type(arr)))
-    return arr
     #return [[sum(pixel) // 3 for pixel in row] for row in arr]
 
 def close_connection(robot, devices, message: str):

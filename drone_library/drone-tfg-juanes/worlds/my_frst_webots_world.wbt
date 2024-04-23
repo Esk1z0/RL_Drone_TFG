@@ -10,8 +10,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.22694274363138456 -0.041316890008000304 0.9730312973965054 3.4886011986939836
-  position 8.960773163553679 3.382878001321526 6.134998081142297
+  orientation -0.13377715409879382 0.05477418466494219 0.9894965698452514 2.365524912670661
+  position 1.4781033062825448 -2.5464705896196227 1.8922559895914317
 }
 TexturedBackground {
 }
@@ -24,7 +24,8 @@ UnevenTerrain {
   flatBounds TRUE
 }
 Table {
-  translation -0.96 0 -0.28
+  translation -0.96 0 0.17
+  frameThickness 0.2
 }
 Wall {
   translation -1.6 0 0.07
@@ -34,11 +35,12 @@ Wall {
   name "wall(1)"
 }
 Mavic2Pro {
-  hidden position_0_0 5.838569137087477e-09
-  hidden position_7_0 1.0616899978036786e-08
-  hidden position_8_0 -4.893477865722004e-09
-  translation -1.1383 0.111002 1.09401
-  rotation 0.035098686415573226 -0.026152189878182217 0.9990416133357392 -1.850175307179586
+  hidden position_0_0 5.9132286470340106e-09
+  hidden position_7_0 3.574622361611641e-08
+  hidden rotation_8 0 1 0 2.9802322387695313e-08
+  hidden position_8_0 4.698778684202572e-09
+  translation -1.1399 0.11891 1.02546
+  rotation -0.035034753182186414 -0.02646562575952674 -0.9990356033308422 1.848738399694393
   controller "xyz_controller"
   supervisor TRUE
   bodySlot [

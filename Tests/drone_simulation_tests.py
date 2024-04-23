@@ -8,23 +8,24 @@ import io
 class MyTestCase(unittest.TestCase):
     def test_something(self):
         drone = drone_simulation.Drone()
-        time.sleep(5)
+        time.sleep(10)
         try:
-
+            start = time.monotonic()
             imagen_bytes = drone.send_receive({"ACTION": "GET_IMAGE", "PARAMS": ""})
-            bytes_rgba = bytearray(imagen_bytes)
-            for i in range(0, len(bytes_rgba), 4):
-                bytes_rgba[i], bytes_rgba[i + 2] = bytes_rgba[i + 2], bytes_rgba[i]
-            imagen = Image.frombytes('RGBA', (400, 240), bytes(bytes_rgba))
-            imagen.show()
-            print(imagen_bytes)
+            imagen = Image.frombytes('RGBA', (400, 240), imagen_bytes)
+
+            r, g, b, a = imagen.split()
+            imagen_rgba = Image.merge('RGBA', (b, g, r, a))
+            fin = time.monotonic()
+            print('tiempo ', str(fin-start))
+            imagen_rgba.show()
 
             time.sleep(5)
         except Exception as e:
             print(e)
             assert False
         time.sleep(5)
-        self.assertEqual(True, True)  # add assertion here
+        assert True
 
     def test_constructor_initialize_instance(self):
         try:
@@ -67,12 +68,18 @@ class MyTestCase(unittest.TestCase):
 
     def test_get_image(self):
         drone = drone_simulation.Drone()
-        time.sleep(5)
+        time.sleep(10)
         try:
             start = time.monotonic()
-            print(drone.send_receive({"ACTION":"GET_IMAGE", "PARAMS": ""}))
-            end = time.monotonic()
-            print("time: " + str(end - start))
+            imagen_bytes = drone.send_receive({"ACTION": "GET_IMAGE", "PARAMS": ""})
+            imagen = Image.frombytes('RGBA', (400, 240), imagen_bytes)
+
+            r, g, b, a = imagen.split()
+            imagen_rgba = Image.merge('RGBA', (b, g, r, a))
+            fin = time.monotonic()
+            print('tiempo ', str(fin - start))
+            imagen_rgba.show()
+
             time.sleep(5)
         except Exception as e:
             print(e)
