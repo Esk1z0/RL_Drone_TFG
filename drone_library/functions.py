@@ -37,18 +37,48 @@ def get_distance(robot, devices, message: str):
     distance_sensor = devices["distance sensor"]
     return distance_sensor.getValue()
 
-def get_image(robot, devices, message: str):
+def get_image(robot, devices, message):
     cam = devices["camera"]
     return cam.getImage()
 
-    #return [[sum(pixel) // 3 for pixel in row] for row in arr]
+def set_MotorRL(robot, devices, message):
+    motor = devices['rear left propeller']
+    motor.setVelocity(-message["velocity"])
+    return "OK_VEL"
 
-def close_connection(robot, devices, message: str):
+def set_MotorRR(robot, devices, message):
+    motor = devices['rear right propeller']
+    motor.setVelocity(message["velocity"])
+    return "OK_VEL"
+
+def set_MotorFL(robot, devices, message):
+    motor = devices['front left propeller']
+    motor.setVelocity(message["velocity"])
+    return "OK_VEL"
+
+def set_MotorFR(robot, devices, message):
+    motor = devices['front right propeller']
+    motor.setVelocity(-message["velocity"])
+    return "OK_VEL"
+
+def set_vel_motors(robot, devices, message):
+    motor_rl = devices['rear left propeller']
+    motor_rr = devices['rear right propeller']
+    motor_fl = devices['front left propeller']
+    motor_fr = devices['front right propeller']
+
+    motor_rl.setVelocity(-message["motor_rl"])
+    motor_rr.setVelocity(message["motor_rr"])
+    motor_fl.setVelocity(message["motor_fl"])
+    motor_fr.setVelocity(-message["motor_fr"])
+    return "VEL_OK"
+
+def close_connection(robot, devices, message):
     robot.simulationQuit(0)
     return "CLOSE_CONNECTION"
 
 
-def provisional_message(robot, devices, message: str):
+def provisional_message(robot, devices, message):
     return b"Lorem ipsum dolor sit amet, " \
            b"consectetur adipiscing elit. Sed vel nisl non orci vehicula posuere. " \
            b"Nullam auctor, leo ut bibendum pellentesque, libero ligula vulputate quam, " \
@@ -64,6 +94,11 @@ FUNCTIONS = [
     get_imu,
     get_distance,
     get_image,
+    set_MotorRL,
+    set_MotorRR,
+    set_MotorFL,
+    set_MotorFR,
+    set_vel_motors,
     close_connection,
     provisional_message
 ]

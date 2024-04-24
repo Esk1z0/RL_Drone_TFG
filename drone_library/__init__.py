@@ -1,7 +1,7 @@
 #Constantes xyz_controller
 HOST = 'localhost'
 PORT = 12000
-TIME_OUT = 5
+TIME_OUT = 8
 
 REQUEST_M = "request_memory"
 RESPONSE_M = "response_memory"
@@ -30,6 +30,11 @@ ACTIONS = [
     "GET_IMU",
     "GET_DISTANCE",
     "GET_IMAGE",
+    "SET_MOTOR_RL",
+    "SET_MOTOR_RR",
+    "SET_MOTOR_FL",
+    "SET_MOTOR_FR",
+    "SET_ALL_MOTORS",
     "CLOSE_CONNECTION",
     "GET_PRM"
 ]

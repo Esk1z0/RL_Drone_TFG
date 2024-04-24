@@ -107,6 +107,8 @@ class DroneServer:
             self.devices.update({i: device})
         for j in ACTUATORS:
             device = self.robot.getDevice(j)
+            device.setPosition(float('inf'))
+            device.setVelocity(1)
             self.devices.update({j: device})
 
     def send_emitter(self, data: bytes):

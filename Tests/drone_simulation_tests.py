@@ -105,7 +105,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_get_distance(self):
         drone = drone_simulation.Drone()
-        time.sleep(7)
+        time.sleep(9)
         try:
             start = time.monotonic()
             x = drone.send_receive({"ACTION": "GET_DISTANCE", "PARAMS": ""})
@@ -113,6 +113,55 @@ class MyTestCase(unittest.TestCase):
             print('tiempo ', str(fin - start))
             print(x)
             time.sleep(5)
+        except Exception as e:
+            print(e)
+            assert False
+        time.sleep(5)
+        assert True
+
+    def test_set_backmotorvel(self):
+        drone = drone_simulation.Drone()
+        time.sleep(9)
+        try:
+            start = time.monotonic()
+            x = drone.send_receive({"ACTION": "SET_MOTOR_RL", "PARAMS": {"velocity": 100}})
+            fin = time.monotonic()
+            print('tiempo ', str(fin - start))
+            print(x)
+            time.sleep(8)
+        except Exception as e:
+            print(e)
+            assert False
+        time.sleep(5)
+        assert True
+
+    def test_set_fourmotors(self):
+        drone = drone_simulation.Drone()
+        time.sleep(9)
+        try:
+            start = time.monotonic()
+            drone.send_receive({"ACTION": "SET_MOTOR_RL", "PARAMS": {"velocity": 300}})
+            drone.send_receive({"ACTION": "SET_MOTOR_RR", "PARAMS": {"velocity": 300}})
+            drone.send_receive({"ACTION": "SET_MOTOR_FL", "PARAMS": {"velocity": 300}})
+            drone.send_receive({"ACTION": "SET_MOTOR_FR", "PARAMS": {"velocity": 300}})
+            fin = time.monotonic()
+            print('tiempo ', str(fin - start))
+            time.sleep(8)
+        except Exception as e:
+            print(e)
+            assert False
+        time.sleep(5)
+        assert True
+
+    def test_set_fourmotors(self):
+        drone = drone_simulation.Drone()
+        time.sleep(9)
+        try:
+            start = time.monotonic()
+            drone.send_receive({"ACTION": "SET_ALL_MOTORS", "PARAMS": {"motor_rl": 300, "motor_rr": 300, "motor_fl": 300, "motor_fr": 300}})
+            fin = time.monotonic()
+            print('tiempo ', str(fin - start))
+            time.sleep(8)
         except Exception as e:
             print(e)
             assert False
