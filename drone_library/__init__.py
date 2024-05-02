@@ -7,7 +7,7 @@ REQUEST_M = "request_memory"
 RESPONSE_M = "response_memory"
 SEM_REQUEST_M = "sem_request_memory"
 SEM_RESPONSE_M = "sem_response_memory"
-SHM_SIZE = 1024
+SHM_SIZE = 2048
 
 TIME_STEP = 10
 SENSORS = ["camera", "inertial unit", "distance sensor"]
@@ -26,10 +26,12 @@ COMMAND = EXECUTE + MODE_FLAGS + WORLD_DIR
 ACTIONS = [
     "TAKE_OFF",
     "LAND",
+    "RESET",
     "GET_TIME",
     "GET_IMU",
     "GET_DISTANCE",
     "GET_IMAGE",
+    "GET_DATA",
     "SET_MOTOR_RL",
     "SET_MOTOR_RR",
     "SET_MOTOR_FL",

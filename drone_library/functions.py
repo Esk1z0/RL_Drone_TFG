@@ -25,6 +25,10 @@ def take_off(robot, devices, message: str):
 def land(robot, devices, message: str):
     return "landing"
 
+def reset_simulation(robot, devices, message: str):
+    robot.simulationReset()
+    return "restarted"
+
 def get_time(robot, devices, message: str):
     return str(robot.getTime())
 
@@ -40,6 +44,13 @@ def get_distance(robot, devices, message: str):
 def get_image(robot, devices, message):
     cam = devices["camera"]
     return cam.getImage()
+
+def get_data(robot, devices, message):
+    return {
+        "camera": bytearray(get_image(robot, devices, message)),
+        "imu": get_imu(robot, devices, message),
+        "distance": get_distance(robot, devices, message)
+    }
 
 def set_MotorRL(robot, devices, message):
     motor = devices['rear left propeller']
@@ -90,10 +101,12 @@ def provisional_message(robot, devices, message):
 FUNCTIONS = [
     take_off,
     land,
+    reset_simulation,
     get_time,
     get_imu,
     get_distance,
     get_image,
+    get_data,
     set_MotorRL,
     set_MotorRR,
     set_MotorFL,

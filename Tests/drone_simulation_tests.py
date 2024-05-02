@@ -8,6 +8,7 @@ import io
 class MyTestCase(unittest.TestCase):
     def test_something(self):
         drone = drone_simulation.Drone()
+        drone.start_simulation()
         time.sleep(10)
         try:
             start = time.monotonic()
@@ -36,6 +37,7 @@ class MyTestCase(unittest.TestCase):
     def test_constructor_initialize_instance(self):
         try:
             drone = drone_simulation.Drone()
+            drone.start_simulation()
             print("Instancia del Drone Creada")
             time.sleep(5)
         except Exception as e:
@@ -45,6 +47,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_send_basic(self):
         drone = drone_simulation.Drone()
+        drone.start_simulation()
         try:
             print(drone.send_receive({"ACTION": "TAKE_OFF", "PARAMS": ""}))
             print("primer mensaje hecho")
@@ -64,6 +67,7 @@ class MyTestCase(unittest.TestCase):
     def test_get_actions(self):
         try:
             drone = drone_simulation.Drone()
+            drone.start_simulation()
             actions = drone.get_actions()
             print(actions)
         except Exception as e:
@@ -74,6 +78,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_get_image(self):
         drone = drone_simulation.Drone()
+        drone.start_simulation()
         time.sleep(10)
         try:
             start = time.monotonic()
@@ -95,6 +100,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_get_imu(self):
         drone = drone_simulation.Drone()
+        drone.start_simulation()
         time.sleep(5)
         try:
             start = time.monotonic()
@@ -111,6 +117,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_get_distance(self):
         drone = drone_simulation.Drone()
+        drone.start_simulation()
         time.sleep(9)
         try:
             start = time.monotonic()
@@ -127,6 +134,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_set_backmotorvel(self):
         drone = drone_simulation.Drone()
+        drone.start_simulation()
         time.sleep(9)
         try:
             start = time.monotonic()
@@ -143,6 +151,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_set_fourmotors(self):
         drone = drone_simulation.Drone()
+        drone.start_simulation()
         time.sleep(9)
         try:
             start = time.monotonic()
@@ -159,8 +168,9 @@ class MyTestCase(unittest.TestCase):
         time.sleep(5)
         assert True
 
-    def test_set_fourmotors(self):
+    def test_set_fourmotors_at_once(self):
         drone = drone_simulation.Drone()
+        drone.start_simulation()
         time.sleep(9)
         try:
             start = time.monotonic()
@@ -168,6 +178,42 @@ class MyTestCase(unittest.TestCase):
             fin = time.monotonic()
             print('tiempo ', str(fin - start))
             time.sleep(8)
+        except Exception as e:
+            print(e)
+            assert False
+        time.sleep(5)
+        assert True
+
+
+    def test_reset_simulation(self):
+        drone = drone_simulation.Drone()
+        drone.start_simulation()
+        time.sleep(9)
+        try:
+            start = time.monotonic()
+            x = drone.send_receive({"ACTION": "RESET", "PARAMS": ""})
+            fin = time.monotonic()
+            print('tiempo ', str(fin - start))
+            print(x)
+            time.sleep(5)
+        except Exception as e:
+            print(e)
+            assert False
+        time.sleep(5)
+        assert True
+
+    def test_get_data(self):
+        drone = drone_simulation.Drone()
+        drone.start_simulation()
+        time.sleep(9)
+        try:
+            start = time.monotonic()
+            x = drone.send_receive({"ACTION": "GET_DATA", "PARAMS": ""})
+            fin = time.monotonic()
+            print(type(x))
+            print(len(x))
+            print('tiempo ', str(fin - start))
+            time.sleep(5)
         except Exception as e:
             print(e)
             assert False

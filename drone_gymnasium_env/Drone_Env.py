@@ -1,16 +1,21 @@
 from gymnasium import Env
 from gymnasium.spaces import Discrete, Box, Dict
 import numpy as np
+from drone_library.drone_simulation import Drone
 
 class DroneCustomEnv(Env):
     metadata = {"render_modes": None, "render_fps": 0}
 
     def __init__(self):
         self.observation_space = Dict({
-            "camera": Box(low=0, high=255, shape=(384000,)),
-            "IMU": Box(low=-1, high=1, shape=(4,)),
-            "Sonar": Box(low=0, high=1)
+            "camera": Box(low=0, high=255, shape=(384000,)), #Image rgba of 400x240
+            "IMU": Box(low=-1, high=1, shape=(4,)), #Quaternion
+            "Sonar": Box(low=0, high=1) #distane from 0 to 1 with a range of 2 meters
         })
+        self.action_space = Box(low=0, high=1, shape=(4,))
+        self.render_mode = None
+        self.drone = Drone()
+
 
 
     def step(self):

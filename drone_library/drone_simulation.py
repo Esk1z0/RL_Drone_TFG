@@ -25,8 +25,8 @@ class Drone:
         self.sem_receptor = BinarySemaphore(name=SEM_RESPONSE_M)
         self.sem_emitter = BinarySemaphore(name=SEM_REQUEST_M)
         self.sim_out = threading.Event()
-        thread = threading.Thread(target=initialize_instance, args=[self.sim_out])
-        thread.start()
+        self.thread = threading.Thread(target=initialize_instance, args=[self.sim_out])
+
 
     def send_receive(self, message: object):
         """
@@ -92,6 +92,10 @@ class Drone:
             Get the list of actions that the simulator can perform
         """
         return ACTIONS
+
+    def start_simulation(self) -> None:
+        self.thread.start()
+
 
     def end_simulation(self) -> None:
         """
