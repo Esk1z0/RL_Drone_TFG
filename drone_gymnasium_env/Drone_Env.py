@@ -3,6 +3,8 @@ from gymnasium.spaces import Discrete, Box
 import numpy as np
 
 class DroneCustomEnv(Env):
+    metadata = {"render_modes": None, "render_fps": 0}
+
     def __init__(self):
         pass
     def step(self):
@@ -10,6 +12,11 @@ class DroneCustomEnv(Env):
     def render(self):
         pass
     def reset(self):
+        pass
+
+    def close(self):
+        pass
+    def reward(self):
         pass
 
 
