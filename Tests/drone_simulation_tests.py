@@ -12,6 +12,12 @@ class MyTestCase(unittest.TestCase):
         try:
             start = time.monotonic()
             imagen_bytes = drone.send_receive({"ACTION": "GET_IMAGE", "PARAMS": ""})
+            array_de_bytes = bytearray(imagen_bytes)
+            print(type(imagen_bytes))
+
+            print(array_de_bytes)
+            print(array_de_bytes[-1])
+            print(len(array_de_bytes))
             imagen = Image.frombytes('RGBA', (400, 240), imagen_bytes)
 
             r, g, b, a = imagen.split()
