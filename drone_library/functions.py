@@ -82,7 +82,7 @@ def set_vel_motors(robot, devices, message):
     motor_rr.setVelocity(message["motor_rr"])
     motor_fl.setVelocity(message["motor_fl"])
     motor_fr.setVelocity(-message["motor_fr"])
-    return "VEL_OK"
+    return "OK_VEL"
 
 def close_connection(robot, devices, message):
     robot.simulationQuit(0)

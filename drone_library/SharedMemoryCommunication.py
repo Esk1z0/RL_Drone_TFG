@@ -32,7 +32,7 @@ class Comm:
             self.send_emitter(chunk)
             self.sem_emitter.read_open()
 
-    def receive_data(self):
+    def receive(self):
         data_received = b''
         self.wait_receiver()
         length = self.receive_start_receiver()

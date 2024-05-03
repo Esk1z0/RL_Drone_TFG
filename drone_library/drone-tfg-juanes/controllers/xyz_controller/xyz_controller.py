@@ -1,15 +1,11 @@
 import sys
-import json
 from threading import Event
 import threading
 import time
-from controller import Supervisor, Camera
-from drone_library import ACTIONS, PORT, HOST, TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, REQUEST_M, RESPONSE_M, \
-    SEM_REQUEST_M, SEM_RESPONSE_M, SHM_SIZE
-from drone_library.functions import FUNCTIONS, Connection_End, Connection_Timeout
-import mmap
+from controller import Supervisor
+from drone_library import ACTIONS, TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, REQUEST_M, RESPONSE_M, SHM_SIZE
+from drone_library.functions import FUNCTIONS
 import pickle
-from Mmap_Semaphore import BinarySemaphore
 from SharedMemoryCommunication import Comm
 
 class DroneServer:
@@ -24,15 +20,8 @@ class DroneServer:
         self.robot = Supervisor()
         self.devices = {}
 
-        self.emitter = mmap.mmap(-1, SHM_SIZE, RESPONSE_M)#igual
-        self.receptor = mmap.mmap(-1, SHM_SIZE, REQUEST_M)#igual
-        self.sem_emitter = BinarySemaphore(name=SEM_RESPONSE_M)#igual
-        self.sem_receptor = BinarySemaphore(name=SEM_REQUEST_M)#igual
-
         self.close_sim = Event()
-
         self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=RESPONSE_M, receiver_name=REQUEST_M, close_event=self.close_sim)
-
 
 
         self.ACTIONS_CONVERT = dict(zip(ACTIONS, FUNCTIONS))
@@ -49,10 +38,10 @@ class DroneServer:
         except Exception as e:
             print(f'Error: {e}')
         finally:
-            self.close_connection()
+            self.channel.close_connection()
 
     def attend_message(self):
-        message = self.receive_data()
+        message = self.channel.receive()
         if message:
             self.start_time = time.monotonic()
             print(message.get('ACTION'))
@@ -61,7 +50,7 @@ class DroneServer:
                 response = func(self.robot, self.devices, message['PARAMS'])  # ejecución de la acción y respuesta
                 if response:
                     print('hola')
-                    self.send_data(pickle.dumps(response))
+                    self.channel.send(pickle.dumps(response))
                 if response == "CLOSE_CONNECTION":
                     print("fin")
                     self.close_sim.set()
@@ -69,41 +58,7 @@ class DroneServer:
                 print(f'Error: Función no encontrada para la acción {message["ACTION"]}')
         self.reception_running = False
 
-    def receive_data(self):#igualar#igual
-        data_received = b''
-        while not self.sem_receptor.is_read_open():
-            if self.close_sim.is_set(): raise Exception("crashed")
-        length = self.receive_receptor()
-        print('len message:' + length.rstrip(b'\x00').decode() + 'yupi')
-        self.send_receptor(b'\x00' * SHM_SIZE)
-        self.sem_receptor.write_open()
 
-        for _ in range(0, int(length.rstrip(b'\x00').decode()), SHM_SIZE):
-            while not self.sem_receptor.is_read_open():
-                if self.close_sim.is_set(): raise Exception("crashed")
-            chunk = self.receive_receptor()
-            data_received += chunk
-            self.sem_receptor.write_open()
-        if data_received:
-            return pickle.loads(data_received)
-        else:
-            return None
-
-    def send_data(self, data):#igual
-        while not self.sem_emitter.is_write_open():
-            if self.close_sim.is_set(): raise Exception("crashed")
-        self.send_emitter(b'\x00' * SHM_SIZE)
-        self.send_emitter(str(len(data)).encode())
-        self.sem_emitter.read_open()
-        for i in range(0, len(data), SHM_SIZE):
-            while not self.sem_emitter.is_write_open():
-                if self.close_sim.is_set(): raise Exception("crashed")
-            chunk = data[i:i + SHM_SIZE]
-            if len(chunk) < SHM_SIZE:
-                self.send_emitter(b'\x00' * SHM_SIZE)
-
-            self.send_emitter(chunk)
-            self.sem_emitter.read_open()
 
     def enable_everything(self):
         for i in SENSORS:
@@ -115,24 +70,6 @@ class DroneServer:
             device.setPosition(float('inf'))
             device.setVelocity(1)
             self.devices.update({j: device})
-
-    def send_emitter(self, data: bytes):#igual
-        self.emitter.seek(0)
-        self.emitter.write(data)
-        self.emitter.flush()
-
-    def receive_receptor(self):#igual
-        self.receptor.seek(0)
-        return self.receptor.read()
-
-    def send_receptor(self, data: bytes):#igual
-        self.receptor.seek(0)
-        self.receptor.write(data)
-        self.receptor.flush()
-
-    def close_connection(self):#igual
-        self.receptor.close()
-        self.emitter.close()
 
     def end_simulation(self):
         self.robot.simulationQuit(0)
