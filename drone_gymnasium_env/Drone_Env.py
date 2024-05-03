@@ -15,6 +15,7 @@ class DroneCustomEnv(Env):
         self.action_space = Box(low=0, high=1, shape=(4,))
         self.render_mode = None
         self.drone = Drone()
+        self.motors = [0, 0, 0, 0]
 
 
 
@@ -23,7 +24,8 @@ class DroneCustomEnv(Env):
     def render(self):
         pass
     def reset(self):
-        pass
+        self.motors = [0, 0, 0, 0]
+
 
     def close(self):
         pass

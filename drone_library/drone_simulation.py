@@ -20,10 +20,10 @@ def initialize_instance(event) -> None:
 class Drone:
     def __init__(self):
         self.sim_up = False
-        self.receptor = mmap.mmap(-1, SHM_SIZE, RESPONSE_M)
-        self.emitter = mmap.mmap(-1, SHM_SIZE, REQUEST_M)
-        self.sem_receptor = BinarySemaphore(name=SEM_RESPONSE_M)
-        self.sem_emitter = BinarySemaphore(name=SEM_REQUEST_M)
+        self.receptor = mmap.mmap(-1, SHM_SIZE, RESPONSE_M)#igual
+        self.emitter = mmap.mmap(-1, SHM_SIZE, REQUEST_M)#igual
+        self.sem_receptor = BinarySemaphore(name=SEM_RESPONSE_M)#igual
+        self.sem_emitter = BinarySemaphore(name=SEM_REQUEST_M)#igual
         self.sim_out = threading.Event()
         self.thread = threading.Thread(target=initialize_instance, args=[self.sim_out])
 
@@ -42,7 +42,7 @@ class Drone:
         print('hola')
         return self.receive()
 
-    def send(self, data) -> None:
+    def send(self, data) -> None:#igual
         """
             Sends the message to the simulator through the socket
             Args:
@@ -62,7 +62,7 @@ class Drone:
             self.send_emitter(chunk)
             self.sem_emitter.read_open()
 
-    def receive(self):
+    def receive(self):#igual
         data_received = b''
         while not self.sem_receptor.is_read_open():
             if self.sim_out.is_set(): raise Exception("crashed")

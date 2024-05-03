@@ -1,6 +1,6 @@
 import sys
 import json
-
+from threading import Event
 import threading
 import time
 from controller import Supervisor, Camera
@@ -10,7 +10,7 @@ from drone_library.functions import FUNCTIONS, Connection_End, Connection_Timeou
 import mmap
 import pickle
 from Mmap_Semaphore import BinarySemaphore
-
+from SharedMemoryCommunication import Comm
 
 class DroneServer:
     def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
@@ -24,12 +24,17 @@ class DroneServer:
         self.robot = Supervisor()
         self.devices = {}
 
-        self.emitter = mmap.mmap(-1, SHM_SIZE, RESPONSE_M)
-        self.receptor = mmap.mmap(-1, SHM_SIZE, REQUEST_M)
-        self.sem_emitter = BinarySemaphore(name=SEM_RESPONSE_M)
-        self.sem_receptor = BinarySemaphore(name=SEM_REQUEST_M)
+        self.emitter = mmap.mmap(-1, SHM_SIZE, RESPONSE_M)#igual
+        self.receptor = mmap.mmap(-1, SHM_SIZE, REQUEST_M)#igual
+        self.sem_emitter = BinarySemaphore(name=SEM_RESPONSE_M)#igual
+        self.sem_receptor = BinarySemaphore(name=SEM_REQUEST_M)#igual
 
-        self.close_sim = threading.Event()
+        self.close_sim = Event()
+
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=RESPONSE_M, receiver_name=REQUEST_M, close_event=self.close_sim)
+
+
+
         self.ACTIONS_CONVERT = dict(zip(ACTIONS, FUNCTIONS))
 
     def main_cycle(self):
@@ -64,7 +69,7 @@ class DroneServer:
                 print(f'Error: Función no encontrada para la acción {message["ACTION"]}')
         self.reception_running = False
 
-    def receive_data(self):
+    def receive_data(self):#igualar#igual
         data_received = b''
         while not self.sem_receptor.is_read_open():
             if self.close_sim.is_set(): raise Exception("crashed")
@@ -84,7 +89,7 @@ class DroneServer:
         else:
             return None
 
-    def send_data(self, data):
+    def send_data(self, data):#igual
         while not self.sem_emitter.is_write_open():
             if self.close_sim.is_set(): raise Exception("crashed")
         self.send_emitter(b'\x00' * SHM_SIZE)
@@ -111,21 +116,21 @@ class DroneServer:
             device.setVelocity(1)
             self.devices.update({j: device})
 
-    def send_emitter(self, data: bytes):
+    def send_emitter(self, data: bytes):#igual
         self.emitter.seek(0)
         self.emitter.write(data)
         self.emitter.flush()
 
-    def receive_receptor(self):
+    def receive_receptor(self):#igual
         self.receptor.seek(0)
         return self.receptor.read()
 
-    def send_receptor(self, data: bytes):
+    def send_receptor(self, data: bytes):#igual
         self.receptor.seek(0)
         self.receptor.write(data)
         self.receptor.flush()
 
-    def close_connection(self):
+    def close_connection(self):#igual
         self.receptor.close()
         self.emitter.close()
 
