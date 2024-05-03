@@ -78,10 +78,10 @@ def set_vel_motors(robot, devices, message):
     motor_fl = devices['front left propeller']
     motor_fr = devices['front right propeller']
 
-    motor_rl.setVelocity(-message["motor_rl"])
-    motor_rr.setVelocity(message["motor_rr"])
-    motor_fl.setVelocity(message["motor_fl"])
-    motor_fr.setVelocity(-message["motor_fr"])
+    motor_rl.setVelocity(-message[0])
+    motor_rr.setVelocity(message[1])
+    motor_fl.setVelocity(message[2])
+    motor_fr.setVelocity(-message[3])
     return "OK_VEL"
 
 def close_connection(robot, devices, message):

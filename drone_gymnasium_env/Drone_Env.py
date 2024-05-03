@@ -3,34 +3,44 @@ from gymnasium.spaces import Discrete, Box, Dict
 import numpy as np
 from drone_library.drone_simulation import Drone
 
-class DroneCustomEnv(Env):
+
+class DroneBaseEnv(Env):
     metadata = {"render_modes": None, "render_fps": 0}
 
     def __init__(self):
         self.observation_space = Dict({
-            "camera": Box(low=0, high=255, shape=(384000,)), #Image rgba of 400x240
-            "IMU": Box(low=-1, high=1, shape=(4,)), #Quaternion
-            "Sonar": Box(low=0, high=1) #distane from 0 to 1 with a range of 2 meters
+            "camera": Box(low=0, high=255, shape=(384000,)),  # Image rgba of 400x240
+            "IMU": Box(low=-1, high=1, shape=(4,)),  # Quaternion
+            "Sonar": Box(low=0, high=1)  # distane from 0 to 1 with a range of 2 meters
         })
         self.action_space = Box(low=0, high=1, shape=(4,))
         self.render_mode = None
         self.drone = Drone()
         self.motors = [0, 0, 0, 0]
 
+    def step(self, action):#TODO
+        truncated = self.drone.send_receive({"ACTION": "SET_ALL_MOTORS", "PARAMS": [300, 300, 300, 300]})
+        observation = self._get_obs()
+        reward, terminated = self.reward()
+        return observation, reward, terminated, truncated, self.drone.get_actions()
 
-
-    def step(self):
-        pass
     def render(self):
         pass
-    def reset(self):
-        self.motors = [0, 0, 0, 0]
 
+    def reset(self, seed=None, options=None):
+        self.motors = [0, 0, 0, 0]
+        self.drone.send_receive({"ACTION": "RESET", "PARAMS": ""})
+        observation = self._get_obs()
+        return observation
 
     def close(self):
-        pass
+        self.drone.end_simulation()
+
     def reward(self):
         pass
+
+    def _get_obs(self):
+        return self.drone.send_receive({"ACTION": "GET_DATA", "PARAMS": ""})
 
 
 if __name__ == '__main__':

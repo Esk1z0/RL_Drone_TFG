@@ -1,12 +1,8 @@
-import threading
 from threading import Event, Thread
 import subprocess
-
-import mmap
 import pickle
 
 from . import *
-from Mmap_Semaphore import BinarySemaphore
 from SharedMemoryCommunication import Comm
 
 def initialize_instance(event) -> None:
@@ -20,11 +16,8 @@ def initialize_instance(event) -> None:
 
 class Drone:
     def __init__(self):
-        self.sim_up = False
-
         self.sim_out = Event()
         self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=REQUEST_M, receiver_name=RESPONSE_M, close_event=self.sim_out)
-
         self.thread = Thread(target=initialize_instance, args=[self.sim_out])
 
 
@@ -39,10 +32,6 @@ class Drone:
         """
         self.channel.send(pickle.dumps(message))
         return self.channel.receive()
-
-
-
-
 
     def get_actions(self) -> list[str]:
         """

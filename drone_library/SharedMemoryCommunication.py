@@ -12,10 +12,10 @@ class Comm:
            swapped
         """
         self.buffer_size = buffer_size
-        self.emitter = mmap.mmap(-1, buffer_size, emitter_name)  # igual
-        self.receptor = mmap.mmap(-1, buffer_size, receiver_name)  # igual
-        self.sem_emitter = BinarySemaphore(name="sem_" + emitter_name)  # igual
-        self.sem_receptor = BinarySemaphore(name="sem_" + receiver_name)  # igual
+        self.emitter = mmap.mmap(-1, buffer_size, emitter_name)
+        self.receptor = mmap.mmap(-1, buffer_size, receiver_name)
+        self.sem_emitter = BinarySemaphore(name="sem_" + emitter_name)
+        self.sem_receptor = BinarySemaphore(name="sem_" + receiver_name)
         self.close = close_event
 
     def send(self, data) -> None:  # igual

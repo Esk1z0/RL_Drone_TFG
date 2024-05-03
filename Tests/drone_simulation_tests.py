@@ -174,7 +174,7 @@ class MyTestCase(unittest.TestCase):
         time.sleep(9)
         try:
             start = time.monotonic()
-            drone.send_receive({"ACTION": "SET_ALL_MOTORS", "PARAMS": {"motor_rl": 300, "motor_rr": 300, "motor_fl": 300, "motor_fr": 300}})
+            drone.send_receive({"ACTION": "SET_ALL_MOTORS", "PARAMS": [300, 300, 300, 300]})
             fin = time.monotonic()
             print('tiempo ', str(fin - start))
             time.sleep(8)
