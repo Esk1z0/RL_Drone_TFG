@@ -59,11 +59,15 @@ class Drone:
         return self.queue.get()
 
     def queue_func(self):
-        while not self.sim_out.is_set():
-            item = self.channel.receive()
-            if self.queue.full():
-                self.queue.get()  # Remove oldest item if queue is full
-            self.queue.put(item)
+        while (not self.sim_out.is_set()):
+            try:
+                item = self.channel.receive()
+                if self.queue.full():
+                    self.queue.get()  # Remove oldest item if queue is full
+                self.queue.put(item)
+            except Exception as e:
+                pass
+
 
     def get_actions(self) -> list[str]:
         """

@@ -1,9 +1,23 @@
 import unittest
-
+from drone_library import drone_simulation
+import time
 
 class MyTestCase(unittest.TestCase):
     def test_something(self):
         self.assertEqual(True, False)  # add assertion here
+
+    def test_inicio(self):
+        drone = drone_simulation.Drone()
+        drone.start_simulation()
+        time.sleep(10)
+        try:
+            time.sleep(5)
+        except Exception as e:
+            print(e)
+            assert False
+        time.sleep(5)
+        assert True
+
 
 
 

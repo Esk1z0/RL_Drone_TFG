@@ -82,3 +82,6 @@ class Comm:
     def close_connection(self):
         self.receptor.close()
         self.emitter.close()
+
+    def is_closed(self):
+        return self.receptor.closed or self.emitter.closed
