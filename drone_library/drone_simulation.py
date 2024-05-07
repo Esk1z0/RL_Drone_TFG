@@ -38,20 +38,6 @@ class Drone:
         self.queue_thread = Thread(target=self.queue_func)
         self.queue = Queue(maxsize=1)
 
-
-
-    def send_receive(self, message: object) -> object:
-        """
-            Sends the message to the simulator through the shared memory and returns what was
-            sent back by the simulation controller
-            Args:
-                message (object): a dict with the form {\"ACTION\":\"FUNC_NAME\", \"PARAMS\": function_parameters}.
-            Returns:
-                object: The Response from the simulator controller, it can be any object
-        """
-        self.channel.send(pickle.dumps(message))
-        return self.channel.receive()
-
     def send(self, action):
         self.channel.send(pickle.dumps(action))
 

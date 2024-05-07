@@ -8,6 +8,7 @@ from drone_library.functions import FUNCTIONS
 import pickle
 from SharedMemoryCommunication import Comm
 
+
 class DroneServer:
     def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
         self.reception_running = False
@@ -21,7 +22,8 @@ class DroneServer:
         self.devices = {}
 
         self.close_sim = Event()
-        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=RESPONSE_M, receiver_name=REQUEST_M, close_event=self.close_sim)
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=RESPONSE_M, receiver_name=REQUEST_M,
+                            close_event=self.close_sim)
 
     def main_cycle(self):
         try:
@@ -41,7 +43,6 @@ class DroneServer:
             print(f'Error: {e}')
         finally:
             self.channel.close_connection()
-
 
     def send_obs(self):
         try:
@@ -68,7 +69,6 @@ class DroneServer:
         finally:
             self.reception_running = False
 
-
     def actions(self, tag, params):
         if tag == "SET_ALL_MOTORS":
             motor_rl = self.devices['rear left propeller']
@@ -85,9 +85,6 @@ class DroneServer:
         elif tag == "CLOSE_CONNECTION":
             self.close_sim.set()
             self.robot.simulationQuit(0)
-
-
-
 
     def enable_everything(self):
         for i in SENSORS:
