@@ -10,7 +10,7 @@ SEM_RESPONSE_M = "sem_response_memory"
 SHM_SIZE = 2048
 
 TIME_STEP = 10
-SENSORS = ["camera", "inertial unit", "distance sensor"]
+SENSORS = ["camera", "inertial unit", "distance sensor", "altimeter", "accelerometer"]
 ACTUATORS = ["front left propeller", "front right propeller",
                      "rear left propeller", "rear right propeller"]
 

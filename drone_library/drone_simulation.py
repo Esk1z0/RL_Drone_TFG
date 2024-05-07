@@ -1,3 +1,4 @@
+from queue import Queue
 from threading import Event, Thread
 import subprocess
 import pickle
@@ -34,6 +35,9 @@ class Drone:
         self.sim_out = Event()
         self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=REQUEST_M, receiver_name=RESPONSE_M, close_event=self.sim_out)
         self.thread = Thread(target=initialize_instance, args=[self.sim_out])
+        self.queue_thread = Thread(target=self.queue_func)
+        self.queue = Queue(maxsize=1)
+
 
 
     def send_receive(self, message: object) -> object:
@@ -48,6 +52,19 @@ class Drone:
         self.channel.send(pickle.dumps(message))
         return self.channel.receive()
 
+    def send(self, action):
+        self.channel.send(pickle.dumps(action))
+
+    def receive(self):
+        return self.queue.get()
+
+    def queue_func(self):
+        while not self.sim_out.is_set():
+            item = self.channel.receive()
+            if self.queue.full():
+                self.queue.get()  # Remove oldest item if queue is full
+            self.queue.put(item)
+
     def get_actions(self) -> list[str]:
         """
             Get the list of actions that the simulator can perform.
@@ -61,6 +78,7 @@ class Drone:
             It starts the thread that calls the simulation command.
         """
         self.thread.start()
+        self.queue_thread.start()
 
 
     def end_simulation(self) -> None:

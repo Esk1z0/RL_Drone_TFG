@@ -10,8 +10,8 @@ from SharedMemoryCommunication import Comm
 
 class DroneServer:
     def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
-        self.server_socket = None
         self.reception_running = False
+        self.sending_running = False
 
         self.start_time = time.monotonic()
         self.time_step = time_step
@@ -24,39 +24,58 @@ class DroneServer:
         self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=RESPONSE_M, receiver_name=REQUEST_M, close_event=self.close_sim)
 
 
-        self.ACTIONS_CONVERT = dict(zip(ACTIONS, FUNCTIONS))
+        #self.ACTIONS_CONVERT = dict(zip(ACTIONS, FUNCTIONS))
 
-    def main_cycle(self):
+    def main_cycle_2(self):
         try:
-            while self.robot.step(self.time_step) != -1:
-                connection_action = threading.Thread(target=self.attend_message)
-                if (not self.close_sim.is_set()) and (not self.reception_running):
+            while (self.robot.step(self.time_step) != -1) and (not self.close_sim.is_set()):
+                if not self.sending_running:
+                    self.sending_running = True
+                    send_thread = threading.Thread(target=self.send_obs)
+                    send_thread.start()
+                if not self.reception_running:
                     self.reception_running = True
-                    connection_action.start()
-                if ((not self.time_out == 0) and (time.monotonic() - self.start_time) > self.time_out) or self.close_sim.is_set():
-                    break
+                    receive_thread = threading.Thread(target=self.receive_action)
+                    receive_thread.start()
         except Exception as e:
             print(f'Error: {e}')
         finally:
             self.channel.close_connection()
 
-    def attend_message(self):
-        message = self.channel.receive()
-        if message:
-            self.start_time = time.monotonic()
-            print(message.get('ACTION'))
-            func = self.ACTIONS_CONVERT.get(message['ACTION'])  # decodificación de la acción
-            if func:
-                response = func(self.robot, self.devices, message['PARAMS'])  # ejecución de la acción y respuesta
-                if response:
-                    print('hola')
-                    self.channel.send(pickle.dumps(response))
-                if response == "CLOSE_CONNECTION":
-                    print("fin")
-                    self.close_sim.set()
-            else:
-                print(f'Error: Función no encontrada para la acción {message["ACTION"]}')
+    def send_obs(self):
+        self.channel.send(pickle.dumps({
+            "camera": bytearray(self.devices["camera"].getImage()),
+            "imu": self.devices["inertial unit"].getQuaternion(),
+            "distance": self.devices["distance sensor"].getValue(),
+            "altimeter": self.devices["altimeter"].getValue(),
+            "accelerometer": self.devices["accelerometer"].getValues()
+        }))
+        self.sending_running = False
+
+    def receive_action(self):
+        action = self.channel.receive()
+        tag = action["ACTION"]
+        params = action["PARAMS"]
+        self.actions(tag, params)
         self.reception_running = False
+
+    def actions(self, tag, params):
+        if tag == "SET_ALL_MOTORS":
+            motor_rl = self.devices['rear left propeller']
+            motor_rr = self.devices['rear right propeller']
+            motor_fl = self.devices['front left propeller']
+            motor_fr = self.devices['front right propeller']
+
+            motor_rl.setVelocity(-params[0])
+            motor_rr.setVelocity(params[1])
+            motor_fl.setVelocity(params[2])
+            motor_fr.setVelocity(-params[3])
+        elif tag == "RESET":
+            self.robot.simulationReset()
+        elif tag == "CLOSE_CONNECTION":
+            self.close_sim.set()
+            self.robot.simulationQuit(0)
+
 
 
 
@@ -80,7 +99,7 @@ if __name__ == '__main__':
     try:
         print(sys.version)
         server.enable_everything()
-        server.main_cycle()
+        server.main_cycle_2()
     except Exception as e:
         print(e)
     finally:

@@ -11,21 +11,6 @@ class MyTestCase(unittest.TestCase):
         drone.start_simulation()
         time.sleep(10)
         try:
-            start = time.monotonic()
-            imagen_bytes = drone.send_receive({"ACTION": "GET_IMAGE", "PARAMS": ""})
-            array_de_bytes = bytearray(imagen_bytes)
-            print(type(imagen_bytes))
-
-            print(array_de_bytes)
-            print(array_de_bytes[-1])
-            print(len(array_de_bytes))
-            imagen = Image.frombytes('RGBA', (400, 240), imagen_bytes)
-
-            r, g, b, a = imagen.split()
-            imagen_rgba = Image.merge('RGBA', (b, g, r, a))
-            fin = time.monotonic()
-            print('tiempo ', str(fin-start))
-            imagen_rgba.show()
 
             time.sleep(5)
         except Exception as e:
