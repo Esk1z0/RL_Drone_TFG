@@ -18,8 +18,8 @@ class DroneBaseEnv(Env):
         self.drone = Drone()
         self.motors = [0, 0, 0, 0]
 
-    def step(self, action):#TODO
-        truncated = self.drone.send_receive({"ACTION": "SET_ALL_MOTORS", "PARAMS": [300, 300, 300, 300]})
+    def step(self, action):
+        truncated = self.drone.send_receive({"ACTION": "SET_ALL_MOTORS", "PARAMS": action})
         observation = self._get_obs()
         reward, terminated = self.reward()
         return observation, reward, terminated, truncated, self.drone.get_actions()
