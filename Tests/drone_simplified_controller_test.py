@@ -49,9 +49,10 @@ class MyTestCase(unittest.TestCase):
         try:
             start = time.monotonic()
             drone.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": [100, 100, 100, 100]})
-            drone.receive()
+            x = drone.receive()
             end = time.monotonic()
             print(end - start)
+            print(x)
         except Exception as e:
             print(e)
             assert False
