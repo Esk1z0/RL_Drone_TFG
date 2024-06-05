@@ -1,6 +1,6 @@
 import time
 
-from Drone_Env import DroneBaseEnv
+from drone_gymnasium_env.Drone_Env import DroneBaseEnv
 from Utils.Quaternions import *
 
 

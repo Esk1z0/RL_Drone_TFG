@@ -1,13 +1,15 @@
 import unittest
-from drone_library import drone_simulation
 import time
+from drone_tfg_juanes.controllers.xyz_controller.drone_library import drone_simulation
+
+world_dir = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/worlds/my_frst_webots_world.wbt"
 
 class MyTestCase(unittest.TestCase):
     def test_something(self):
         self.assertEqual(True, False)  # add assertion here
 
     def test_inicio(self):
-        drone = drone_simulation.Drone()
+        drone = drone_simulation.Drone(world_dir)
         drone.start_simulation()
         time.sleep(10)
         try:
@@ -19,7 +21,7 @@ class MyTestCase(unittest.TestCase):
         assert True
 
     def test_get_data_basic(self):
-        drone = drone_simulation.Drone()
+        drone = drone_simulation.Drone(world_dir)
         drone.start_simulation()
         time.sleep(10)
         try:
@@ -31,7 +33,7 @@ class MyTestCase(unittest.TestCase):
         assert True
 
     def test_set_motors(self):
-        drone = drone_simulation.Drone()
+        drone = drone_simulation.Drone(world_dir)
         drone.start_simulation()
         time.sleep(10)
         try:
@@ -43,7 +45,7 @@ class MyTestCase(unittest.TestCase):
         assert True
 
     def test_send_receive(self):
-        drone = drone_simulation.Drone()
+        drone = drone_simulation.Drone(world_dir)
         drone.start_simulation()
         time.sleep(10)
         try:
