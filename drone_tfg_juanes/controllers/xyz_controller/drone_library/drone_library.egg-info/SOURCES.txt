@@ -1,0 +1,5 @@
+setup.py
+drone_library.egg-info/PKG-INFO
+drone_library.egg-info/SOURCES.txt
+drone_library.egg-info/dependency_links.txt
+drone_library.egg-info/top_level.txt

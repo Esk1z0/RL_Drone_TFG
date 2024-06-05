@@ -1,0 +1,115 @@
+import sys
+from threading import Event
+import threading
+import time
+from controller import Supervisor
+
+from drone_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, REQUEST_M, RESPONSE_M, SHM_SIZE
+
+import pickle
+
+from drone_library.SharedMemoryCommunication import Comm
+
+class DroneServer:
+    def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
+        self.reception_running = False
+        self.sending_running = False
+
+        self.start_time = time.monotonic()
+        self.time_step = time_step
+        self.time_out = time_out
+
+        self.robot = Supervisor()
+        self.devices = {}
+
+        self.close_sim = Event()
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=RESPONSE_M, receiver_name=REQUEST_M,
+                            close_event=self.close_sim)
+
+    def main_cycle(self):
+        try:
+            while (self.robot.step(self.time_step) != -1) and (not self.close_sim.is_set()):
+                if not self.sending_running:
+                    self.sending_running = True
+                    send_thread = threading.Thread(target=self.send_obs)
+                    send_thread.start()
+                if not self.reception_running:
+                    self.start_time = time.monotonic()
+                    self.reception_running = True
+                    receive_thread = threading.Thread(target=self.receive_action)
+                    receive_thread.start()
+                if (time.monotonic() - self.start_time) > self.time_out:
+                    self.close_sim.set()
+        except Exception as e:
+            print(f'Error: {e}')
+        finally:
+            self.channel.close_connection()
+
+    def send_obs(self):
+        try:
+            self.channel.send(pickle.dumps({
+                "camera": bytearray(self.devices["camera"].getImage()),
+                "imu": self.devices["inertial unit"].getQuaternion(),
+                "distance": self.devices["distance sensor"].getValue(),
+                "altimeter": self.devices["altimeter"].getValue(),
+                "accelerometer": self.devices["accelerometer"].getValues()
+            }))
+        except:
+            pass
+        finally:
+            self.sending_running = False
+
+    def receive_action(self):
+        try:
+            action = self.channel.receive()
+            tag = action["ACTION"]
+            params = action["PARAMS"]
+            self.actions(tag, params)
+        except:
+            pass
+        finally:
+            self.reception_running = False
+
+    def actions(self, tag, params):
+        if tag == "SET_ALL_MOTORS":
+            motor_rl = self.devices['rear left propeller']
+            motor_rr = self.devices['rear right propeller']
+            motor_fl = self.devices['front left propeller']
+            motor_fr = self.devices['front right propeller']
+
+            motor_rl.setVelocity(-params[0])
+            motor_rr.setVelocity(params[1])
+            motor_fl.setVelocity(params[2])
+            motor_fr.setVelocity(-params[3])
+        elif tag == "RESET":
+            self.robot.simulationReset()
+        elif tag == "CLOSE_CONNECTION":
+            self.close_sim.set()
+            self.robot.simulationQuit(0)
+
+    def enable_everything(self):
+        for i in SENSORS:
+            device = self.robot.getDevice(i)
+            device.enable(self.time_step)
+            self.devices.update({i: device})
+        for j in ACTUATORS:
+            device = self.robot.getDevice(j)
+            device.setPosition(float('inf'))
+            device.setVelocity(1)
+            self.devices.update({j: device})
+
+    def end_simulation(self):
+        self.robot.simulationQuit(0)
+
+
+if __name__ == '__main__':
+    server = DroneServer()
+    try:
+        print(sys.version)
+        server.enable_everything()
+        server.main_cycle()
+    except Exception as e:
+        print(e)
+    finally:
+        time.sleep(10)
+        server.end_simulation()
