@@ -3,10 +3,11 @@ from threading import Event
 import threading
 import time
 from controller import Supervisor
-from gym_drone_library.drone_library import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, REQUEST_M, RESPONSE_M, SHM_SIZE
+from drone_library import ACTIONS, TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, REQUEST_M, RESPONSE_M, SHM_SIZE
+from drone_library.functions import FUNCTIONS
 import pickle
 from SharedMemoryCommunication import Comm
-
+from ..SharedMemory
 
 class DroneServer:
     def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):

@@ -1,7 +1,8 @@
 from threading import Event
 import mmap
 import pickle
-from Mmap_Semaphore import BinarySemaphore
+
+from .Mmap_Semaphore import BinarySemaphore
 
 class Comm:
 
@@ -42,7 +43,6 @@ class Comm:
             data_received += chunk
             self.sem_receptor.write_open()
         return pickle.loads(data_received) if data_received else None
-
 
     def send_start_emitter(self, data):
         self.send_emitter(b'\x00' * self.buffer_size)
