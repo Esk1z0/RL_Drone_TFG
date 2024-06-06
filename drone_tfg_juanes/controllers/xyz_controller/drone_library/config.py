@@ -1,7 +1,7 @@
 #Constantes xyz_controller
 HOST = 'localhost'
 PORT = 12000
-TIME_OUT = 8
+TIME_OUT = 5
 
 REQUEST_M = "request_memory"
 RESPONSE_M = "response_memory"
@@ -10,17 +10,16 @@ SEM_RESPONSE_M = "sem_response_memory"
 SHM_SIZE = 2048
 
 TIME_STEP = 10
-SENSORS = ["camera", "inertial unit", "distance sensor"]
+SENSORS = ["camera", "inertial unit", "distance sensor", "altimeter", "accelerometer"]
 ACTUATORS = ["front left propeller", "front right propeller",
                      "rear left propeller", "rear right propeller"]
 
 
 #Constantes Drone
-WORLD_DIR = " ..\drone_library\drone-tfg-juanes\worlds\my_frst_webots_world.wbt"
 MODE_FLAGS = " --batch --mode=realtime "#--no-rendering --minimize "
 EXECUTE = "webots "
 
-COMMAND = EXECUTE + MODE_FLAGS + WORLD_DIR
+COMMAND = EXECUTE + MODE_FLAGS
 
 #Funciones
 ACTIONS = [

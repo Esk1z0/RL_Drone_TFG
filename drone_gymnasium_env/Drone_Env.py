@@ -1,13 +1,12 @@
 from gymnasium import Env
-from gymnasium.spaces import Discrete, Box, Dict
-import numpy as np
-from drone_library.drone_simulation import Drone
+from gymnasium.spaces import Box, Dict
+from drone_simulation import Drone
 
 
 class DroneBaseEnv(Env):
     metadata = {"render_modes": None, "render_fps": 0}
 
-    def __init__(self):
+    def __init__(self, maxtime, command):
         self.observation_space = Dict({
             "camera": Box(low=0, high=255, shape=(384000,)),  # Image rgba of 400x240
             "IMU": Box(low=-1, high=1, shape=(4,)),  # Quaternion
@@ -18,10 +17,19 @@ class DroneBaseEnv(Env):
         self.drone = Drone()
         self.motors = [0, 0, 0, 0]
 
+        self.maxtime = maxtime
+        self.command = command
+
+        self.drone.start_simulation()
+
     def step(self, action):
-        truncated = self.drone.send_receive({"ACTION": "SET_ALL_MOTORS", "PARAMS": action})
-        observation = self._get_obs()
-        reward, terminated = self.reward()
+        reward, terminated = 0, True
+        self.drone.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": action})
+        observation = self.get_obs()
+        observation["command"] = self.command
+        truncated = self.is_truncated()
+        if not truncated:
+            reward, terminated = self.reward(observation)
         return observation, reward, terminated, truncated, self.drone.get_actions()
 
     def render(self):
@@ -29,18 +37,21 @@ class DroneBaseEnv(Env):
 
     def reset(self, seed=None, options=None):
         self.motors = [0, 0, 0, 0]
-        self.drone.send_receive({"ACTION": "RESET", "PARAMS": ""})
-        observation = self._get_obs()
+        self.drone.send({"ACTION": "RESET", "PARAMS": ""})
+        observation = self.get_obs()
         return observation
 
     def close(self):
         self.drone.end_simulation()
 
-    def reward(self):
+    def reward(self, observation):
         pass
 
-    def _get_obs(self):
-        return self.drone.send_receive({"ACTION": "GET_DATA", "PARAMS": ""})
+    def is_truncated(self):
+        return self.drone.is_sim_out()
+
+    def get_obs(self):
+        return self.drone.send({"ACTION": "GET_DATA", "PARAMS": ""})
 
 
 if __name__ == '__main__':

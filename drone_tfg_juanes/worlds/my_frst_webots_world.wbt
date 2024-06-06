@@ -36,14 +36,22 @@ Wall {
 }
 Mavic2Pro {
   hidden position_0_0 5.9132286470340106e-09
-  hidden position_7_0 3.574622361611641e-08
-  hidden rotation_8 0 1 0 2.9802322387695313e-08
-  hidden position_8_0 4.698778684202572e-09
+  hidden position_9_0 3.574622361611641e-08
+  hidden rotation_10 0 1 0 2.9802322387695313e-08
+  hidden position_10_0 4.698778684202572e-09
   translation -0.82517 0.367926 1.00246
   rotation 0.018341503170858708 0.031222005397625634 0.9993441727655112 -2.6335253071795863
   controller "xyz_controller"
   supervisor TRUE
+  synchronization FALSE
   bodySlot [
+    Accelerometer {
+      lookupTable [
+        0 0 0
+      ]
+    }
+    Altimeter {
+    }
     DistanceSensor {
       translation 0.075 0 0
       lookupTable [

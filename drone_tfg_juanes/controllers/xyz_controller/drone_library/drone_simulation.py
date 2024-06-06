@@ -1,16 +1,20 @@
+from queue import Queue
 from threading import Event, Thread
 import subprocess
 import pickle
 
-from . import *
-from SharedMemoryCommunication import Comm
+from .config import *
 
-def initialize_instance(event) -> None:
+from .SharedMemoryCommunication import Comm
+
+
+def initialize_instance(event, webots_dir) -> None:
     """
         Activates the Webots World in mode realtime and activating the flags batch and realtime
     """
-    proceso = subprocess.run(COMMAND, shell=True, capture_output=True, text=True)
+    proceso = subprocess.run(COMMAND + webots_dir, shell=True, capture_output=True, text=True)
     print('Salida Simulador: ' + str(proceso.returncode))
+    print(str(proceso.stdout))
     event.set()
 
 
@@ -27,26 +31,36 @@ class Drone:
             thread : Thread
                 It is the thread that runs the command line that starts the simulation, when it ends sets the sim_out Event to finish the communication channel too.
     """
-    def __init__(self):
+
+
+
+    def __init__(self, webots_dir):
         """
             Initialize the drone interface, the channel and the simulation
         """
+        self.webots_dir = webots_dir
         self.sim_out = Event()
         self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=REQUEST_M, receiver_name=RESPONSE_M, close_event=self.sim_out)
-        self.thread = Thread(target=initialize_instance, args=[self.sim_out])
+        self.thread = Thread(target=initialize_instance, args=[self.sim_out, self.webots_dir])
+        self.queue_thread = Thread(target=self.queue_func)
+        self.queue = Queue(maxsize=1)
 
+    def send(self, action):
+        self.channel.send(pickle.dumps(action))
 
-    def send_receive(self, message: object) -> object:
-        """
-            Sends the message to the simulator through the shared memory and returns what was
-            sent back by the simulation controller
-            Args:
-                message (object): a dict with the form {\"ACTION\":\"FUNC_NAME\", \"PARAMS\": function_parameters}.
-            Returns:
-                object: The Response from the simulator controller, it can be any object
-        """
-        self.channel.send(pickle.dumps(message))
-        return self.channel.receive()
+    def receive(self):
+        return self.queue.get()
+
+    def queue_func(self):
+        while (not self.sim_out.is_set()):
+            try:
+                item = self.channel.receive()
+                if self.queue.full():
+                    self.queue.get()  # Remove oldest item if queue is full
+                self.queue.put(item)
+            except Exception as e:
+                pass
+
 
     def get_actions(self) -> list[str]:
         """
@@ -61,6 +75,7 @@ class Drone:
             It starts the thread that calls the simulation command.
         """
         self.thread.start()
+        self.queue_thread.start()
 
 
     def end_simulation(self) -> None:

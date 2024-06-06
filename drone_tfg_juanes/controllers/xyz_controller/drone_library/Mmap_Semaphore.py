@@ -34,7 +34,7 @@ class BinarySemaphore:
 
     def is_write_open(self):
         self.mem.seek(0)
-        return (self.mem.read(1) == b'1')
+        return self.mem.read(1) == b'1'
 
     def __del__(self):
         self.mem.close()
