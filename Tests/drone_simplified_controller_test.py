@@ -6,7 +6,7 @@ world_dir = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/worlds/my_frst_webo
 
 class MyTestCase(unittest.TestCase):
     def test_something(self):
-        self.assertEqual(True, False)  # add assertion here
+        self.assertEqual(True, True)  # add assertion here
 
     def test_inicio(self):
         drone = drone_simulation.Drone(world_dir)

@@ -49,7 +49,7 @@ class Drone:
         self.channel.send(pickle.dumps(action))
 
     def receive(self):
-        return self.channel.receive()
+        return self.queue.get()
 
     def queue_func(self):
         while (not self.sim_out.is_set()):
