@@ -1,7 +1,6 @@
 import time
 
 from drone_tfg_juanes.enviroments_package.Drone_Env import DroneBaseEnv
-from Utils.Quaternions import *
 
 
 class Drone_TakeOff_ENV(DroneBaseEnv):
@@ -13,8 +12,8 @@ class Drone_TakeOff_ENV(DroneBaseEnv):
     The reward() returns the exponential value of the time the drone maintains itself in the air.
     """
 
-    def __init__(self, maxtime, command):
-        super().__init__(maxtime, command)
+    def __init__(self, maxtime, command, simulation_dir):
+        super().__init__(maxtime, command, simulation_dir)
         obs = super().get_obs()
 
         self.initial_altitude = obs["altimeter"]

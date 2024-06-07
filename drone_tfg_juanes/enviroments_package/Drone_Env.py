@@ -4,15 +4,14 @@ from drone_tfg_juanes.simulation_package.controllers.xyz_controller.drone_librar
 class DroneBaseEnv():
 
 
-    def __init__(self, maxtime, command):
-        self.observation_space = Dict({
-            "camera": Box(low=0, high=255, shape=(384000,)),  # Image rgba of 400x240
-            "IMU": Box(low=-1, high=1, shape=(4,)),  # Quaternion
-            "Sonar": Box(low=0, high=1)  # distane from 0 to 1 with a range of 2 meters
-        })
-        self.action_space = Box(low=0, high=1, shape=(4,))
-        self.render_mode = None
-        self.drone = Drone()
+    def __init__(self, maxtime, command, simulation_dir):
+        self.observation_space = {
+            "camera": "Image rgba of 400x240",
+            "IMU": "Quaternion",
+            "Sonar": "distane from 0 to 1 with a range of 2 meters"
+        }
+        self.action_space = "array of 4 values from  to 1"
+        self.drone = Drone(simulation_dir)
         self.motors = [0, 0, 0, 0]
 
         self.maxtime = maxtime
@@ -30,9 +29,6 @@ class DroneBaseEnv():
             reward, terminated = self.reward(observation)
         return observation, reward, terminated, truncated, self.drone.get_actions()
 
-    def render(self):
-        pass
-
     def reset(self, seed=None, options=None):
         self.motors = [0, 0, 0, 0]
         self.drone.send({"ACTION": "RESET", "PARAMS": ""})
@@ -49,7 +45,7 @@ class DroneBaseEnv():
         return self.drone.is_sim_out()
 
     def get_obs(self):
-        return self.drone.send({"ACTION": "GET_DATA", "PARAMS": ""})
+        return self.drone.receive()
 
 
 if __name__ == '__main__':

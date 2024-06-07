@@ -77,6 +77,8 @@ class Drone:
         self.thread.start()
         self.queue_thread.start()
 
+    def is_sim_out(self):
+        return self.sim_out.is_set()
 
     def end_simulation(self) -> None:
         """
