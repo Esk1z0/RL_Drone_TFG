@@ -1,10 +1,8 @@
-from gymnasium import Env
-from gymnasium.spaces import Box, Dict
-from drone_simulation import Drone
+from drone_tfg_juanes.simulation_package.controllers.xyz_controller.drone_library.drone_simulation import Drone
 
 
-class DroneBaseEnv(Env):
-    metadata = {"render_modes": None, "render_fps": 0}
+class DroneBaseEnv():
+
 
     def __init__(self, maxtime, command):
         self.observation_space = Dict({
