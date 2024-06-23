@@ -9,7 +9,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(True, True)  # add assertion here
 
     def test_inicio(self):
-        drone = drone_simulation.Drone(world_dir)
+        drone = drone_simulation.Drone(world_dir, batch=True, realtime=True)
         drone.start_simulation()
         time.sleep(10)
         try:
@@ -21,7 +21,7 @@ class MyTestCase(unittest.TestCase):
         assert True
 
     def test_get_data_basic(self):
-        drone = drone_simulation.Drone(world_dir)
+        drone = drone_simulation.Drone(world_dir, batch=True, realtime=True)
         drone.start_simulation()
         time.sleep(10)
         try:
@@ -33,7 +33,7 @@ class MyTestCase(unittest.TestCase):
         assert True
 
     def test_set_motors(self):
-        drone = drone_simulation.Drone(world_dir)
+        drone = drone_simulation.Drone(world_dir, batch=True, realtime=True)
         drone.start_simulation()
         time.sleep(10)
         try:
@@ -45,7 +45,7 @@ class MyTestCase(unittest.TestCase):
         assert True
 
     def test_send_receive(self):
-        drone = drone_simulation.Drone(world_dir)
+        drone = drone_simulation.Drone(world_dir, batch=True, realtime=True)
         drone.start_simulation()
         time.sleep(6)
         try:

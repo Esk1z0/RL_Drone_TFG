@@ -16,10 +16,15 @@ ACTUATORS = ["front left propeller", "front right propeller",
 
 
 #Constantes Drone
-MODE_FLAGS = " --batch --mode=realtime "# --no-rendering --minimize "
-EXECUTE = "webots "
+FLAGS = {
+    "batch": " --batch",
+    "realtime": " --mode=realtime",
+    "fast": "mode=fast",
+    "no_rendering": " --no-rendering",
+    "minimize": " --minimize"
+}
 
-COMMAND = EXECUTE + MODE_FLAGS
+BASE_COMMAND = "webots"
 
 #Funciones
 ACTIONS = [
