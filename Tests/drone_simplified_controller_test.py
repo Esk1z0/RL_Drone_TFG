@@ -2,7 +2,7 @@ import unittest
 import time
 from drone_tfg_juanes.simulation_package.controllers.xyz_controller.drone_library import drone_simulation
 
-world_dir = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/worlds/my_frst_webots_world.wbt"
+world_dir = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/simulation_package/worlds/my_frst_webots_world.wbt"
 
 class MyTestCase(unittest.TestCase):
     def test_something(self):
@@ -47,7 +47,7 @@ class MyTestCase(unittest.TestCase):
     def test_send_receive(self):
         drone = drone_simulation.Drone(world_dir)
         drone.start_simulation()
-        time.sleep(10)
+        time.sleep(6)
         try:
             start = time.monotonic()
             drone.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": [100, 100, 100, 100]})

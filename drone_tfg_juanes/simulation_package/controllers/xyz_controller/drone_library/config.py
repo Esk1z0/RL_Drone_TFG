@@ -1,7 +1,7 @@
 #Constantes xyz_controller
 HOST = 'localhost'
 PORT = 12000
-TIME_OUT = 5
+TIME_OUT = 7
 
 REQUEST_M = "request_memory"
 RESPONSE_M = "response_memory"
@@ -16,7 +16,7 @@ ACTUATORS = ["front left propeller", "front right propeller",
 
 
 #Constantes Drone
-MODE_FLAGS = " --batch --mode=realtime "#--no-rendering --minimize "
+MODE_FLAGS = " --batch --mode=realtime "# --no-rendering --minimize "
 EXECUTE = "webots "
 
 COMMAND = EXECUTE + MODE_FLAGS
