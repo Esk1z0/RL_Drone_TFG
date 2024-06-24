@@ -4,12 +4,27 @@ from threading import Event, Thread
 
 
 class CommandExecutor:
-    def __init__(self, simulation_out_event: Event, file_dir, **kwargs):
+    """This class handle the simulation command that runs the simulation world file"""
+    def __init__(self, simulation_out_event: Event, file_dir: str, **kwargs):
+        """Creates the command with the flags selected and the file direction
 
+        Args:
+            simulation_out_event (Event): Is the event which is set when the simulation is finished
+            file_dir (str): Is the direction of the webots world file
+            **kwargs: Flags used in the command to run the simulation
+
+        Keyword Args:
+            batch (bool): Use the flag --batch on the command
+            realtime (bool): Use the flag --mode=realtime to set the speed to real time on the simulation
+            fast (bool): Use the flag --mode=fast to set the speed to fast on the simulation
+            no_rendering (bool): Use the flag --no-rendering to disable the graphics on the simulation, any camera will
+            be rendered anyway
+            minimize (bool): Use the flag --minimize to not open the simulation on the screen
+        """
         if not file_dir:
-            raise ValueError("The atribute 'file_dir' is mandatory")
+            raise ValueError("The attribute 'file_dir' is mandatory")
         if not simulation_out_event:
-            raise ValueError("The atribute 'simulation_out_event' is mandatory")
+            raise ValueError("The attribute 'simulation_out_event' is mandatory")
 
         self.simulation_out = simulation_out_event
         self.command = BASE_COMMAND
@@ -19,7 +34,13 @@ class CommandExecutor:
                 self.command += FLAGS[flag]
         self.command += " "+file_dir
 
-    def execute(self):
+    def execute(self) -> None:
+        """Runs the command that opens the webots file to start the simulation on another thread and set the event
+        at the end
+        Returns:
+            None
+            """
+
         def run_command():
             try:
                 result = subprocess.run(self.command, shell=True, capture_output=True, text=True)

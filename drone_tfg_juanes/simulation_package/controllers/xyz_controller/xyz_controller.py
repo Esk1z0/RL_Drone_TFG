@@ -1,14 +1,12 @@
-import sys
-from threading import Event
 import threading
 import time
+import pickle
 from controller import Supervisor
 
 from drone_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, REQUEST_M, RESPONSE_M, SHM_SIZE
 
-import pickle
-
 from drone_library.SharedMemoryCommunication import Comm
+
 
 class DroneServer:
     def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
@@ -22,28 +20,40 @@ class DroneServer:
         self.robot = Supervisor()
         self.devices = {}
 
-        self.close_sim = Event()
+        self.close_sim = threading.Event()
         self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=RESPONSE_M, receiver_name=REQUEST_M,
                             close_event=self.close_sim)
 
     def main_cycle(self):
         try:
-            while (self.robot.step(self.time_step) != -1) and (not self.close_sim.is_set()):
-                if not self.sending_running:
-                    self.sending_running = True
-                    send_thread = threading.Thread(target=self.send_obs)
-                    send_thread.start()
-                if not self.reception_running:
-                    self.start_time = time.monotonic()
-                    self.reception_running = True
-                    receive_thread = threading.Thread(target=self.receive_action)
-                    receive_thread.start()
-                if (time.monotonic() - self.start_time) > self.time_out:
-                    self.close_sim.set()
-        except Exception as e:
-            print(f'Error: {e}')
+            while self.simulation_up():
+                self.sending()
+                self.receiving()
+                self.closing_evaluation()
+        except Exception as error:
+            print(f'Error: {error}')
         finally:
             self.channel.close_connection()
+
+    def simulation_up(self):
+        return (self.robot.step(self.time_step) != -1) and (not self.close_sim.is_set())
+
+    def sending(self):
+        if not self.sending_running:
+            self.sending_running = True
+            send_thread = threading.Thread(target=self.send_obs)
+            send_thread.start()
+
+    def receiving(self):
+        if not self.reception_running:
+            self.start_time = time.monotonic()
+            self.reception_running = True
+            receive_thread = threading.Thread(target=self.receive_action)
+            receive_thread.start()
+
+    def closing_evaluation(self):
+        if (time.monotonic() - self.start_time) > self.time_out:
+            self.close_sim.set()
 
     def send_obs(self):
         try:
@@ -105,7 +115,7 @@ class DroneServer:
 if __name__ == '__main__':
     server = DroneServer()
     try:
-        print(sys.version)
+        print("Simulation Starting")
         server.enable_everything()
         server.main_cycle()
     except Exception as e:

@@ -1,21 +1,11 @@
 from queue import Queue
 from threading import Event, Thread
-import subprocess
 import pickle
 
 from .config import *
 
 from .SharedMemoryCommunication import Comm
 from .executor import CommandExecutor
-
-def initialize_instance(event, webots_dir) -> None:
-    """
-        Activates the Webots World in mode realtime and activating the flags batch and realtime
-    """
-    proceso = subprocess.run(BASE_COMMAND + webots_dir, shell=True, capture_output=True, text=True)
-    print('Salida Simulador: ' + str(proceso.returncode))
-    print(str(proceso.stdout))
-    event.set()
 
 
 class Drone:
@@ -32,15 +22,14 @@ class Drone:
                 It is the thread that runs the command line that starts the simulation, when it ends sets the sim_out Event to finish the communication channel too.
     """
 
-
     def __init__(self, webots_dir, **kwargs):
         """
             Initialize the drone interface, the channel and the simulation
         """
         self.webots_dir = webots_dir
         self.sim_out = Event()
-        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=REQUEST_M, receiver_name=RESPONSE_M, close_event=self.sim_out)
-        #self.thread = Thread(target=initialize_instance, args=[self.sim_out, self.webots_dir])
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=REQUEST_M, receiver_name=RESPONSE_M,
+                            close_event=self.sim_out)
         self.command_executor = CommandExecutor(self.sim_out, webots_dir, **kwargs)
         self.queue_thread = Thread(target=self.queue_func)
         self.queue = Queue(maxsize=1)
@@ -52,7 +41,7 @@ class Drone:
         return self.queue.get()
 
     def queue_func(self):
-        while (not self.sim_out.is_set()):
+        while not self.sim_out.is_set():
             try:
                 item = self.channel.receive()
                 if self.queue.full():
@@ -61,14 +50,13 @@ class Drone:
             except Exception as e:
                 pass
 
-
     def get_actions(self) -> list[str]:
         """
             Get the list of actions that the simulator can perform.
             Returns:
                 list[str]: It is the collection of the names of all the functions
         """
-        return ACTIONS
+        pass
 
     def start_simulation(self) -> None:
         """
@@ -86,5 +74,3 @@ class Drone:
         """
         self.channel.send(pickle.dumps({"ACTION": "CLOSE_CONNECTION", "PARAMS": ""}))
         self.channel.close_connection()
-
-
