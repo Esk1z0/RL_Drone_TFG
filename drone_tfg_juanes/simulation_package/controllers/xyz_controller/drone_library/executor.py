@@ -37,6 +37,7 @@ class CommandExecutor:
     def execute(self) -> None:
         """Runs the command that opens the webots file to start the simulation on another thread and set the event
         at the end
+
         Returns:
             None
             """
