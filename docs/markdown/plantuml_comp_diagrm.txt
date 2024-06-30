@@ -1,0 +1,64 @@
+@startuml
+!theme blueprint
+!define component class
+
+node "Coordinator Node" {
+  [Scheduler] as Scheduler
+  [Data Manager] as DataManager
+  [Connection-package] as ConnectionPackageCentral
+
+}
+
+Scheduler -(0- DataManager
+Scheduler -(0- ConnectionPackageCentral
+
+node "On-Premise/Online? Server" {
+  database "MongoDB" as MongoDB
+  [Grafana] <<external>> as Grafana
+  [Prometheus] <<external>> as Prometheus
+}
+
+Grafana --> Prometheus
+DataManager --> MongoDB
+Prometheus --> DataManager
+
+
+node "Worker Node" {
+  [Connection-package] as ConnectionPackageLocal
+  [Train-package] as TrainPackage
+  [Sim-package] as SimPackage
+  [Environment-package] as EnvironmentPackage
+  [Webots] <<external>> as Webots
+  [NN-package] as NNPackage
+}
+
+
+SimPackage -(0- Webots
+EnvironmentPackage -(0- SimPackage
+TrainPackage -(0- EnvironmentPackage
+TrainPackage -(0- NNPackage
+TrainPackage -(0- ConnectionPackageLocal
+
+
+package "Models" {
+  [Flight-model.pth] as FlightModel
+  [CNN-model.pth] as CNNModel
+  [transformer-model.pth] as TransformerModel
+}
+
+NNPackage -right-> FlightModel
+NNPackage -right-> CNNModel
+NNPackage -right-> TransformerModel
+
+
+
+interface IDataAccess
+
+interface ILogger
+
+MongoDB --> IDataAccess
+Grafana --> ILogger
+
+ConnectionPackageLocal -(0)- ConnectionPackageCentral
+
+@enduml

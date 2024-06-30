@@ -6,6 +6,9 @@ from .Mmap_Semaphore import BinarySemaphore
 
 
 class Comm:
+    """
+        This class use the mmap as a buffer and a BinarySemaphore to pass information through shared memory.
+    """
 
     def __init__(self, buffer_size: int, emitter_name: str, receiver_name: str, close_event: Event):
         """

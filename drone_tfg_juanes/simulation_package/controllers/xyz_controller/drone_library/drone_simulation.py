@@ -3,25 +3,16 @@ from threading import Event, Thread
 import pickle
 
 from .config import *
-
 from .SharedMemoryCommunication import Comm
 from .executor import CommandExecutor
 
 
 class Drone:
     """
-        It is the interface with the drone controller.
-        It is made in order to be able to run the simulation from code.
-
-        Attributes:
-            sim_out : Event
-                It is the Event that is used by the communication module in order to signal the interface that the simulation crashed or by the interface.
-            channel : Comm
-                It is the communication channel with the controller using shared memory.
-            thread : Thread
-                It is the thread that runs the command line that starts the simulation, when it ends sets the sim_out Event to finish the communication channel too.
+        It works as an interface with the simulation in 4 simple functions. It starts the simulation, sends the motor
+        actions, receive the data from the sensors and shutdown the simulation
     """
-
+    #TODO: Conesguir que se puedan crear varias simulaciones simulatáneas
     def __init__(self, webots_dir, **kwargs):
         """
             Initialize the drone interface, the channel and the simulation
@@ -49,14 +40,6 @@ class Drone:
                 self.queue.put(item)
             except Exception as e:
                 pass
-
-    def get_actions(self) -> list[str]:
-        """
-            Get the list of actions that the simulator can perform.
-            Returns:
-                list[str]: It is the collection of the names of all the functions
-        """
-        pass
 
     def start_simulation(self) -> None:
         """
