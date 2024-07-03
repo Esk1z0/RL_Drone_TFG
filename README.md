@@ -91,11 +91,7 @@ reforzado, utilizando algoritmos como PPO o A3C, o incluso un algoritmo evolutiv
 - Persistencia de modelos a medio entrenar, modelos entrenados y metadatos del entrenamiento con MongoDB.
 - Servicio de monitorización con Grafana y Prometheus para seguir el progreso del entrenamiento.
 
-### Flujo de Datos
-
-Explica el flujo de datos a través del sistema, desde la entrada hasta la salida final.
-
-### Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 - **Programas y Software Externo**
   - Webots: Para la simulación del dron en un entorno 3D.
