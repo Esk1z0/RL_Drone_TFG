@@ -17,9 +17,11 @@ class Drone:
         """
             Initialize the drone interface, the channel and the simulation
         """
+        REQUEST_MEMORY, RESPONSE_MEMORY = get_next_instance_name()
+
         self.webots_dir = webots_dir
         self.sim_out = Event()
-        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=REQUEST_M, receiver_name=RESPONSE_M,
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=REQUEST_MEMORY, receiver_name=RESPONSE_MEMORY,
                             close_event=self.sim_out)
         self.command_executor = CommandExecutor(self.sim_out, webots_dir, **kwargs)
         self.queue_thread = Thread(target=self.queue_func)

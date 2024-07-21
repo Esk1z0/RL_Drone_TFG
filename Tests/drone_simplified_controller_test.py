@@ -60,7 +60,27 @@ class MyTestCase(unittest.TestCase):
             assert False
         time.sleep(5)
         assert True
-
+    def test_multiple_simulations(self):
+        drone1 = drone_simulation.Drone(world_dir, batch=True, realtime=True)
+        drone2 = drone_simulation.Drone(world_dir, batch=True, realtime=True)
+        drone1.start_simulation()
+        drone2.start_simulation()
+        time.sleep(6)
+        try:
+            start = time.monotonic()
+            drone1.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": [100, 100, 100, 100]})
+            drone2.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": [100, 100, 100, 100]})
+            x = drone1.receive()
+            y = drone2.receive()
+            end = time.monotonic()
+            print(end - start)
+            print(x)
+            print(y)
+        except Exception as e:
+            print(e)
+            assert False
+        time.sleep(5)
+        assert True
 
 
 

@@ -3,13 +3,15 @@ import time
 import pickle
 from controller import Supervisor
 
-from drone_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, REQUEST_M, RESPONSE_M, SHM_SIZE
+from drone_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, SHM_SIZE, get_next_instance_name
 
 from drone_library.SharedMemoryCommunication import Comm
 
 
 class DroneServer:
     def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
+        REQUEST_MEMORY, RESPONSE_MEMORY = get_next_instance_name()
+
         self.reception_running = False
         self.sending_running = False
 
@@ -21,7 +23,7 @@ class DroneServer:
         self.devices = {}
 
         self.close_sim = threading.Event()
-        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=RESPONSE_M, receiver_name=REQUEST_M,
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=RESPONSE_MEMORY, receiver_name=REQUEST_MEMORY,
                             close_event=self.close_sim)
 
     def main_cycle(self):
