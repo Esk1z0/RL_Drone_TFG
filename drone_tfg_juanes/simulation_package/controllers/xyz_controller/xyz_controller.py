@@ -10,8 +10,8 @@ from drone_library.SharedMemoryCommunication import Comm
 
 class DroneServer:
     def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
-        REQUEST_MEMORY, RESPONSE_MEMORY = get_next_instance_name()
-
+        REQUEST_MEMORY, RESPONSE_MEMORY = get_next_instance_name(is_client=False)
+        print(REQUEST_MEMORY, RESPONSE_MEMORY)
         self.reception_running = False
         self.sending_running = False
 

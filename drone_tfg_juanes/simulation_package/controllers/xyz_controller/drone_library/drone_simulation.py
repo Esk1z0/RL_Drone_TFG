@@ -12,12 +12,11 @@ class Drone:
         It works as an interface with the simulation in 4 simple functions. It starts the simulation, sends the motor
         actions, receive the data from the sensors and shutdown the simulation
     """
-    #TODO: Conesguir que se puedan crear varias simulaciones simulatáneas
     def __init__(self, webots_dir, **kwargs):
         """
             Initialize the drone interface, the channel and the simulation
         """
-        REQUEST_MEMORY, RESPONSE_MEMORY = get_next_instance_name()
+        REQUEST_MEMORY, RESPONSE_MEMORY = get_next_instance_name(is_client=True)
 
         self.webots_dir = webots_dir
         self.sim_out = Event()
