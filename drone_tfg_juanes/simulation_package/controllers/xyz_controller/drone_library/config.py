@@ -29,7 +29,7 @@ def get_next_instance_name(is_client=True):
         lines = g.readlines()
         client_counter = int(lines[0].strip())
         server_counter = int(lines[1].strip())
-        print(f"Valores actuales de los contadores - Cliente: {client_counter}, Servidor: {server_counter}")
+        #print(f"Valores actuales de los contadores - Cliente: {client_counter}, Servidor: {server_counter}")
 
     if is_client:
         client_counter += 1
@@ -44,7 +44,7 @@ def get_next_instance_name(is_client=True):
 
     with open(COUNTER_FILE, "w") as g:
         g.writelines(lines)
-        print(f"Nuevos valores de los contadores guardados - Cliente: {client_counter}, Servidor: {server_counter}")
+        #print(f"Nuevos valores de los contadores guardados - Cliente: {client_counter}, Servidor: {server_counter}")
 
     if is_client:
         request_name = REQUEST_MEMORY.format(client_counter)
@@ -58,7 +58,7 @@ def get_next_instance_name(is_client=True):
     return request_name, response_name
 
 
-SENSORS = ["camera", "inertial unit", "distance sensor", "altimeter", "accelerometer"]
+SENSORS = ["camera", "inertial unit", "left distance sensor", "right distance sensor", "altimeter", "accelerometer"]
 ACTUATORS = ["front left propeller", "front right propeller",
              "rear left propeller", "rear right propeller"]
 

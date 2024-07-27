@@ -61,8 +61,9 @@ class DroneServer:
         try:
             self.channel.send(pickle.dumps({
                 "camera": bytearray(self.devices["camera"].getImage()),
-                "imu": self.devices["inertial unit"].getQuaternion(),
-                "distance": self.devices["distance sensor"].getValue(),
+                "inertial unit": self.devices["inertial unit"].getQuaternion(),
+                "left distance sensor": self.devices["left distance sensor"].getValue(),
+                "right distance sensor": self.devices["right distance sensor"].getValue(),
                 "altimeter": self.devices["altimeter"].getValue(),
                 "accelerometer": self.devices["accelerometer"].getValues()
             }))

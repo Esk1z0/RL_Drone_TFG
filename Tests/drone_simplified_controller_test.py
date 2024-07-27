@@ -60,6 +60,33 @@ class MyTestCase(unittest.TestCase):
             assert False
         time.sleep(5)
         assert True
+
+    def test_two_samples(self):
+        drone = drone_simulation.Drone(world_dir, batch=True, realtime=True)
+        drone.start_simulation()
+        time.sleep(6)
+        try:
+            x = []
+            y = 1.5
+            #drone.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": [300, 300, 300, 300]})
+            x.append(drone.receive()["accelerometer"])
+            time.sleep(y)
+            x.append(drone.receive()["accelerometer"])
+            #drone.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": [0, 0, 0, 0]})
+            time.sleep(y)
+            x.append(drone.receive()["accelerometer"])
+            time.sleep(y)
+            x.append(drone.receive()["accelerometer"])
+
+            x.append(drone.receive()["altimeter"])
+            print(x)
+
+        except Exception as e:
+            print(e)
+            assert False
+        time.sleep(1)
+        assert True
+
     def test_multiple_simulations(self):
         drone1 = drone_simulation.Drone(world_dir, batch=True, realtime=True)
         drone2 = drone_simulation.Drone(world_dir, batch=True, realtime=True)

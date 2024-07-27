@@ -2,58 +2,60 @@
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/UnevenTerrain.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/dji/mavic/protos/Mavic2Pro.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/apartment_structure/protos/Wall.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/tables/protos/Table.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Parquetry.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/chairs/protos/WoodenChair.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/street_furniture/protos/FireHydrant.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/toys/protos/RubberDuck.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.1780353590514378 0.02144454067560319 0.9837903956649698 2.4347700181258793
-  position 3.3453932654163063 -3.6132299998068684 2.978863370727687
+  orientation 0.03619580387816658 -0.9982798360825156 0.04612193244736559 5.4104045933963825
+  position -22.746660258623443 0.09166663436003458 8.29719013320108
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
-UnevenTerrain {
-  rotation 0 0 1 -1.5707953071795862
-  size 40 40 4
-  flatCenter TRUE
-  flatBounds TRUE
-}
 Table {
-  translation -0.96 0 0.17
+  translation -17.33 0 0
   frameThickness 0.2
 }
-Wall {
-  translation -1.6 0 0.07
-}
-Wall {
-  translation -1.61 -2.29 0.07
-  name "wall(1)"
-}
 Mavic2Pro {
-  hidden position_0_0 5.9132286470340106e-09
-  hidden position_9_0 3.574622361611641e-08
-  hidden rotation_10 0 1 0 2.9802322387695313e-08
-  hidden position_10_0 4.698778684202572e-09
-  translation -0.82517 0.367926 1.00246
-  rotation 0.018341503170858708 0.031222005397625634 0.9993441727655112 -2.6335253071795863
+  hidden position_0_0 5.8095024135182395e-09
+  hidden linearVelocity_0 1.1383588560680331e-12 1.1398595426188179e-10 7.638732242664077e-14
+  hidden angularVelocity_0 1.567868957261921e-13 -1.7405521913327845e-12 -2.4256151069307017e-09
+  hidden position_10_0 3.556777026624584e-08
+  hidden rotation_11 0 1 0 2.9802322387695313e-08
+  hidden position_11_0 -4.913382349682119e-09
+  translation -17.315696698790894 0.0058862319998331785 0.8055726722257127
+  rotation -0.005022281815073138 -0.9894150267236174 -0.14502648578405786 0.07086126473073438
   controller "xyz_controller"
   supervisor TRUE
   synchronization FALSE
   bodySlot [
-    Accelerometer {
+    DistanceSensor {
+      translation 0.075 0 0
+      rotation 0 0 1 -0.5235996938995747
+      name "right distance sensor"
       lookupTable [
         0 0 0
+        2 1 0
       ]
+      resolution 0.001
+    }
+    Accelerometer {
     }
     Altimeter {
     }
     DistanceSensor {
       translation 0.075 0 0
+      rotation 0 0 1 0.5236003061004253
+      name "left distance sensor"
       lookupTable [
         0 0 0
         2 1 0
@@ -64,4 +66,76 @@ Mavic2Pro {
       name "imu"
     }
   ]
+}
+Floor {
+  size 40 40
+  appearance Parquetry {
+    type "light strip"
+  }
+}
+RubberDuck {
+  translation -5.14668 0.853343 0.02
+  rotation 0 0 1 -2.3561953071795863
+  scale 7
+}
+FireHydrant {
+  translation -8.75 0.87 0
+}
+Group {
+  children [
+    Wall {
+      translation -19.14 0 0
+    }
+    Wall {
+      translation -19.14 -1.09 0
+      name "wall(1)"
+    }
+    Wall {
+      translation -15.57 -1.28 0
+      name "wall(9)"
+    }
+    Wall {
+      translation -15.57 1.37 0
+      name "wall(10)"
+      size 0.2 1 0
+    }
+    Wall {
+      translation -18.52 -1.68 0
+      rotation 0 0 1 1.5708
+      name "wall(3)"
+    }
+    Wall {
+      translation -17.38 -1.68 0
+      rotation 0 0 1 1.5708
+      name "wall(4)"
+    }
+    Wall {
+      translation -16.26 -1.68 0
+      rotation 0 0 1 1.5708
+      name "wall(5)"
+    }
+    Wall {
+      translation -18.49 1.77 0
+      rotation 0 0 1 1.5708
+      name "wall(6)"
+    }
+    Wall {
+      translation -17.36 1.77 0
+      rotation 0 0 1 1.5708
+      name "wall(7)"
+    }
+    Wall {
+      translation -16.23 1.77 0
+      rotation 0 0 1 1.5708
+      name "wall(8)"
+    }
+    Wall {
+      translation -19.14 1.16 0
+      name "wall(11)"
+    }
+  ]
+}
+WoodenChair {
+  translation -12.4 0.81 0
+  rotation 0 0 1 -2.3561953071795863
 }
