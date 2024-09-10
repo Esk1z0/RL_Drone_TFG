@@ -97,7 +97,6 @@ Group {
     Wall {
       translation -15.57 1.37 0
       name "wall(10)"
-      size 0.2 1 0
     }
     Wall {
       translation -18.52 -1.68 0

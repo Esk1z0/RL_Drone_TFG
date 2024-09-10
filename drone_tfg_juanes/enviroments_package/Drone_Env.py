@@ -1,44 +1,50 @@
 from drone_tfg_juanes.simulation_package.controllers.xyz_controller.drone_library.drone_simulation import Drone
 
+import numpy as np
+from gymnasium import Env, spaces
 
-class DroneBaseEnv():
 
+class DroneBaseEnv(Env):
 
-    def __init__(self, maxtime, command, simulation_dir):
-        self.observation_space = {
-            "camera": "Image rgba of 400x240",
-            "IMU": "Quaternion",
-            "Sonar": "distane from 0 to 1 with a range of 2 meters"
-        }
-        self.action_space = "array of 4 values from  to 1"
+    def __init__(self, simulation_dir):
+        self.observation_space = spaces.Dict({
+            "camera": spaces.Box(low=0, high=255, shape=(240, 400), dtype=np.uint8),
+            "inertial unit": spaces.Box(low=-1, high=1, shape=(4,), dtype=np.float32),
+            "left distance sensor": spaces.Box(low=0, high=1, dtype=np.float32),
+            "right distance sensor": spaces.Box(low=0, high=1, dtype=np.float32),
+            "altimeter": spaces.Box(low=0, high=np.inf, dtype=np.float32),
+            "accelerometer": spaces.Box(low=-np.inf, high=np.inf, shape=(4,), dtype=np.float32),
+            "command": spaces.MultiBinary(8)
+        })
+
+        self.action_space = spaces.Box(low=0, high=1, shape=(4,), dtype=np.float32)
+
         self.drone = Drone(simulation_dir)
         self.motors = [0, 0, 0, 0]
-
-        self.maxtime = maxtime
-        self.command = command
-
         self.drone.start_simulation()
+
 
     def step(self, action):
         reward, terminated = 0, True
         self.drone.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": action})
         observation = self.get_obs()
-        observation["command"] = self.command
+        observation["command"] = 00000000
+
         truncated = self.is_truncated()
         if not truncated:
-            reward, terminated = self.reward(observation)
-        return observation, reward, terminated, truncated, self.drone.get_actions()
+            reward, terminated, command = self.get_reward(observation)
+            observation["command"] = command
+        return observation, reward, terminated, truncated, True
 
     def reset(self, seed=None, options=None):
-        self.motors = [0, 0, 0, 0]
         self.drone.send({"ACTION": "RESET", "PARAMS": ""})
-        observation = self.get_obs()
-        return observation
+        self.motors = [0, 0, 0, 0]
+        return self.get_obs()
 
     def close(self):
         self.drone.end_simulation()
 
-    def reward(self, observation):
+    def get_reward(self, observation):
         pass
 
     def is_truncated(self):

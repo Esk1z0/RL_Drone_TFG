@@ -109,8 +109,53 @@ class MyTestCase(unittest.TestCase):
         time.sleep(5)
         assert True
 
+    def test_image_trasformation(self):
+        import numpy as np
+        import matplotlib.pyplot as plt
+        def bytearray_to_grayscale_numpy(image_bytes, width, height):
+            # Convertir bytearray a un array de numpy
+            arr = np.frombuffer(image_bytes, dtype=np.uint8).reshape((height, width, 4))
+            #arr = image_bytes
+            # Extraer canales R, G, B
+            B, G, R = arr[:, :, 0], arr[:, :, 1], arr[:, :, 2]
+
+            # Calcular la luminancia según la percepción humana
+            # Esta fórmula pondera más el canal verde y menos el azul.
+            gray = 0.299 * R + 0.587 * G + 0.114 * B
+
+            # Convertir a uint8 si es necesario
+            gray = gray.astype(np.uint8)
+
+            return gray
+
+        def visualize(grayscale_image_numpy):
+            plt.figure(figsize=(8, 5))  # Tamaño de la figura en pulgadas
+            plt.imshow(grayscale_image_numpy, cmap='gray')  # Mostrar la imagen en escala de grises
+            plt.axis('off')  # Desactivar los ejes para una mejor visualización
+            plt.show()
 
 
+
+        drone = drone_simulation.Drone(world_dir, batch=True, realtime=True)
+        drone.start_simulation()
+        time.sleep(7)
+        width, height = 400, 240
+        try:
+            start = time.monotonic()
+            x = drone.receive()
+
+            grayscale_image_numpy = bytearray_to_grayscale_numpy(x["camera"], width, height)
+            end = time.monotonic()
+            drone.end_simulation()
+            print(end - start)
+            visualize(grayscale_image_numpy)
+            print(grayscale_image_numpy)
+        except Exception as e:
+            print(e)
+            assert False
+
+        time.sleep(3)
+        assert True
 
 
 if __name__ == '__main__':
