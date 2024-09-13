@@ -23,8 +23,9 @@ class Drone:
         self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=REQUEST_MEMORY, receiver_name=RESPONSE_MEMORY,
                             close_event=self.sim_out)
         self.command_executor = CommandExecutor(self.sim_out, webots_dir, **kwargs)
-        self.queue_thread = Thread(target=self.queue_func)
         self.queue = Queue(maxsize=1)
+        self.queue_thread = Thread(target=self.queue_func)
+
 
     def send(self, action):
         self.channel.send(pickle.dumps(action))

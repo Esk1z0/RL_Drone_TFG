@@ -42,6 +42,7 @@ class Comm:
             chunk = data[i:i + self.buffer_size]
             if len(chunk) < self.buffer_size:
                 self.send_emitter(b'\x00' * self.buffer_size)
+
             self.send_emitter(chunk)
             self.sem_emitter.read_open()
 

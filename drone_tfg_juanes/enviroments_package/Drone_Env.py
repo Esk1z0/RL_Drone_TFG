@@ -4,7 +4,7 @@ import numpy as np
 from gymnasium import Env, spaces
 
 
-class DroneBaseEnv(Env):
+class DroneEnv(Env):
 
     def __init__(self, simulation_dir):
         self.observation_space = spaces.Dict({
@@ -19,7 +19,7 @@ class DroneBaseEnv(Env):
 
         self.action_space = spaces.Box(low=0, high=1, shape=(4,), dtype=np.float32)
 
-        self.drone = Drone(simulation_dir)
+        self.drone = Drone(simulation_dir, batch=True, realtime=True)
         self.motors = [0, 0, 0, 0]
         self.drone.start_simulation()
 
@@ -34,6 +34,9 @@ class DroneBaseEnv(Env):
         if not truncated:
             reward, terminated, command = self.get_reward(observation)
             observation["command"] = command
+
+            if truncated:
+                self.drone.end_simulation()
         return observation, reward, terminated, truncated, True
 
     def reset(self, seed=None, options=None):
@@ -45,7 +48,7 @@ class DroneBaseEnv(Env):
         self.drone.end_simulation()
 
     def get_reward(self, observation):
-        pass
+        return 0, False, 00000000
 
     def is_truncated(self):
         return self.drone.is_sim_out()

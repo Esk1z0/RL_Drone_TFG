@@ -1,4 +1,4 @@
-from test_strategy import TestStrategy
+from test_no_roll import TestStrategy
 
 
 class TestContext:

@@ -29,8 +29,8 @@ class DroneServer:
     def main_cycle(self):
         try:
             while self.simulation_up():
-                self.sending()
                 self.receiving()
+                self.sending()
                 self.closing_evaluation()
         except Exception as error:
             print(f'Error: {error}')
@@ -75,6 +75,7 @@ class DroneServer:
     def receive_action(self):
         try:
             action = self.channel.receive()
+            print(action)#TODO borrar
             tag = action["ACTION"]
             params = action["PARAMS"]
             self.actions(tag, params)
