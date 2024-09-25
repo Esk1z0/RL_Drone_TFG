@@ -1,0 +1,19 @@
+{
+  "reward_curriculum": [
+    {"reward_function": {
+      "name": "takeoff",
+      "info": "This reward function measures how well the drone take off and stay for 2 seconds in the air",
+      "alpha": 0.98,
+      "final_reward": 100000,
+      "tests": [
+        {
+          "name": "no_roll",
+          "max_angle": 10
+        },{
+          "name": "timer",
+          "max_time": 20
+        }
+      ]
+    }}
+  ]
+}
