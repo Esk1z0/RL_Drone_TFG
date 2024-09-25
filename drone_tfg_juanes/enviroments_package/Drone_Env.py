@@ -17,7 +17,7 @@ class DroneEnv(Env):
             "command": spaces.MultiBinary(8)
         })
 
-        self.action_space = spaces.Box(low=0, high=1, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(low=0, high=200, shape=(4,), dtype=np.float32)
 
         self.drone = Drone(simulation_dir, batch=True, realtime=True)
         self.motors = [0, 0, 0, 0]
@@ -25,7 +25,8 @@ class DroneEnv(Env):
 
 
     def step(self, action):
-        reward, terminated = 0, True
+        reward, terminated, truncated = 0, False, False
+
         self.drone.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": action})
         observation = self.get_obs()
         observation["command"] = 00000000
@@ -35,8 +36,9 @@ class DroneEnv(Env):
             reward, terminated, command = self.get_reward(observation)
             observation["command"] = command
 
-            if truncated:
-                self.drone.end_simulation()
+        else:
+            self.drone.end_simulation()
+
         return observation, reward, terminated, truncated, True
 
     def reset(self, seed=None, options=None):

@@ -11,7 +11,7 @@ class MyTestCase(unittest.TestCase):
     def test_setup_close(self):
         try:
             env = DroneEnv(world_dir)
-            time.sleep(5)
+            time.sleep(7)
             env.close()
         except Exception as e:
             print(e)
@@ -22,6 +22,32 @@ class MyTestCase(unittest.TestCase):
         env = DroneEnv(world_dir)
         print(env.observation_space)
         print(env.action_space)
+        env.close()
+
+    def test_action_sample(self):
+        env = DroneEnv(world_dir)
+        x = env.action_space.sample()
+        print(type(x))
+        env.close()
+
+    def test_one_step(self):
+        env = DroneEnv(world_dir)
+        env.step(action=env.action_space.sample())
+        time.sleep(5)
+        env.close()
+        assert (True, True)
+
+
+    def test_100step_cycle(self):
+        env = DroneEnv(world_dir)
+        action = [100, 100, 100]
+        for i in range(100):
+            action = env.action_space.sample() if i%20 == 0 else action
+            observation, reward, terminated, truncated, info = env.step(action)
+
+            if terminated or truncated:
+                observation, info = env.reset()
+
         env.close()
 
 

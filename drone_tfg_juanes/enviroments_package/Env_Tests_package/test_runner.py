@@ -1,8 +1,8 @@
-from test_no_roll import TestStrategy
+from test_no_roll import TestStrategyBasic
 
 
 class TestContext:
-    def __init__(self, strategy: TestStrategy):
+    def __init__(self, strategy: TestStrategyBasic):
         self.strategy = strategy
 
     def run(self, data: dict) -> None:

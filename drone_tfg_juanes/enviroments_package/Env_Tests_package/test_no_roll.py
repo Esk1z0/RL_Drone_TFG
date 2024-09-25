@@ -1,11 +1,13 @@
-from test_basic import TestStrategy
+from test_basic import TestStrategyBasic
 
 
-class TestNoRoll(TestStrategy):
+class TestNoRoll(TestStrategyBasic):
 
-
-    def start_test(self, data: dict, time) -> None:
+    def start_test(self, obs: dict, time) -> None:
         pass
 
-    def get_reward(self, data: dict, time) -> (int, bool):
+    def get_reward(self, obs: dict, time) -> (int, bool, bool):
+        pass
+
+    def teardown(self):
         pass
