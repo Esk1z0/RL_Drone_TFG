@@ -1,7 +1,7 @@
-from test_basic import TestStrategyBasic
+from reward_basic import RewardStrategyInterface
 
 
-class TestNoRoll(TestStrategyBasic):
+class RewardNoRoll(RewardStrategyInterface):
 
     def start_test(self, obs: dict, time) -> None:
         pass

@@ -1,8 +1,8 @@
-from test_no_roll import TestStrategyBasic
+from reward_basic import RewardStrategyInterface
 
 
 class TestContext:
-    def __init__(self, strategy: TestStrategyBasic):
+    def __init__(self, strategy: RewardStrategyInterface):
         self.strategy = strategy
 
     def run(self, data: dict) -> None:

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class TestStrategyBasic(ABC):
+class RewardStrategyInterface(ABC):
     @abstractmethod
     def start_test(self, obs: dict, time) -> None:
         """It starts the test with the observations"""

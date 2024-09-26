@@ -1,7 +1,7 @@
 import json
 
 
-class TestLoader:
+class RewardLoader:
     def __init__(self, json_path):
         self.json_path = json_path
         self.current_package_index = 0
