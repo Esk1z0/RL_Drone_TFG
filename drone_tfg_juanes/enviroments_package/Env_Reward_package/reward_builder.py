@@ -6,13 +6,16 @@ from .rewards import reward_dict
 class RewardLoader:
     def __init__(self, json_path):
         self.json_path = json_path
-        self.current_package_index = 0
+        self.current_package_index = -1
         self.packages = []
 
     def load_packages(self):
         with open(self.json_path, 'r') as file:
             config = json.load(file)
         self.packages = config['reward_curriculum']
+
+    def restart(self):
+        self.current_package_index = -1
 
     def get_next_reward_function(self):
         self.current_package_index += 1
@@ -22,16 +25,13 @@ class RewardLoader:
         else:
             return None
 
-    def get_current_reward_function(self):
-        package = self.packages[self.current_package_index]
-        return self._load_single_package(package["reward_function"])
-
     def _load_single_package(self, reward_function):
         return Reward_Runner(
             name=reward_function["name"],
             info=reward_function["info"],
             alpha=reward_function["alpha"],
             final_reward=reward_function["final_reward"],
+            command=reward_function["command"],
             rewards=self._build_tests(reward_function["tests"])
         )
 

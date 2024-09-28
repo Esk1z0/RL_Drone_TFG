@@ -17,7 +17,7 @@ class MyTestCase(unittest.TestCase):
     def test_load_takeoff_build(self):
         loader = RewardLoader(json_path)
         loader.load_packages()
-        print(loader.get_current_reward_function())
+        print(loader.get_next_reward_function())
         self.assertEqual(True, True)
 
 if __name__ == '__main__':
