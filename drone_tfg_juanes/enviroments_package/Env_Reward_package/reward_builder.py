@@ -1,4 +1,6 @@
 import json
+from .reward_runner import Reward_Runner
+from .rewards import reward_dict
 
 
 class RewardLoader:
@@ -10,15 +12,33 @@ class RewardLoader:
     def load_packages(self):
         with open(self.json_path, 'r') as file:
             config = json.load(file)
-        self.packages = config['test_packages']
+        self.packages = config['reward_curriculum']
 
-    def get_next_package(self):
+    def get_next_reward_function(self):
         self.current_package_index += 1
         if self.current_package_index < len(self.packages):
             package = self.packages[self.current_package_index]
-            return [globals()[test['class_name']](test['params']) for test in package['tests']]
-        return None
+            return self._load_single_package(package["reward_function"])
+        else:
+            return None
 
-    def get_current_package_tests(self):
+    def get_current_reward_function(self):
         package = self.packages[self.current_package_index]
-        return [globals()[test['class_name']](test['params']) for test in package['tests']]
+        return self._load_single_package(package["reward_function"])
+
+    def _load_single_package(self, reward_function):
+        return Reward_Runner(
+            name=reward_function["name"],
+            info=reward_function["info"],
+            alpha=reward_function["alpha"],
+            final_reward=reward_function["final_reward"],
+            rewards=self._build_tests(reward_function["tests"])
+        )
+
+    def _build_tests(self, tests):
+        tests_list = []
+        for test in tests:
+            class_constructor = reward_dict[test["name"]]
+            class_params = test["parameters"]
+            tests_list.append(class_constructor(**class_params))
+        return tests_list
