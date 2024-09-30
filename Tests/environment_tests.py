@@ -34,6 +34,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_one_step(self):
         env = DroneEnv(world_dir, json_path)
+        env.reset()
         env.step(action=env.action_space.sample())
         time.sleep(5)
         env.close()
@@ -42,18 +43,19 @@ class MyTestCase(unittest.TestCase):
 
     def test_100step_cycle(self):
         env = DroneEnv(world_dir, json_path)
+        observation = env.reset()
         action = [100, 100, 100]
         for i in range(100):
             action = env.action_space.sample() if i%20 == 0 else action
             observation, reward, terminated, truncated, info = env.step(action)
-
+            print(observation)
             if terminated or truncated:
                 observation, info = env.reset()
 
         env.close()
 
     def test_reward_function(self):
-
+        pass
 
 
 if __name__ == '__main__':

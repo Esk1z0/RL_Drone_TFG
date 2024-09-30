@@ -1,5 +1,5 @@
 from drone_tfg_juanes.simulation_package.controllers.xyz_controller.drone_library.drone_simulation import Drone
-from Env_Reward_package.reward_builder import RewardLoader
+from drone_tfg_juanes.enviroments_package.Env_Reward_package.reward_builder import RewardLoader
 import numpy as np
 from gymnasium import Env, spaces
 
@@ -59,9 +59,11 @@ class DroneEnv(Env):
         self.drone.end_simulation()
 
     def get_reward(self, observation):
-        #TODO this function needs to check if the reward_function is finished so that it can ask the builder for the next one
-
-        return 0, False
+        #TODO test this shit, I declare myself not responsible for what I wrote related to this function
+        reward, terminated, change_reward_function = self.reward_function.get_reward(observation)
+        if change_reward_function:
+            self.reward_function = self.reward_function_loader.get_next_reward_function()
+        return reward, terminated
 
     def is_truncated(self):
         return self.drone.is_sim_out()
