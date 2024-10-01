@@ -98,6 +98,7 @@ class DroneServer:
             motor_fr.setVelocity(-params[3])
         elif tag == "RESET":
             self.robot.simulationReset()
+            self.enable_everything()
         elif tag == "CLOSE_CONNECTION":
             self.close_sim.set()
             self.robot.simulationQuit(0)
