@@ -1,7 +1,7 @@
 import os
 
 # Constantes xyz_controller
-TIME_OUT = 7
+TIME_OUT = 15
 TIME_STEP = 10
 
 SHM_SIZE = 2048

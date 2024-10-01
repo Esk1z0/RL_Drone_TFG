@@ -6,16 +6,12 @@
       "alpha": 0.98,
       "final_reward": 100000,
       "command": 1,
+      "max_time": 10,
       "tests": [
         {
           "name": "no_roll",
-          "parameters":{
-            "max_angle": 10
-          }
-        },{
-          "name": "timer",
           "parameters": {
-            "max_time": 20
+            "max_angle": 10
           }
         }
       ]
@@ -26,6 +22,7 @@
       "alpha": 0.98,
       "final_reward": 100000,
       "command": 0,
+      "max_time": 10,
       "tests": [
         {
           "name": "no_roll",

@@ -53,13 +53,9 @@ class DroneEnv(Env):
         obs = self.get_obs()
 
         self.reward_function.start_reward(obs)
-        return obs
-
-    def close(self):
-        self.drone.end_simulation()
+        return obs, None
 
     def get_reward(self, observation):
-        #TODO test this shit, I declare myself not responsible for what I wrote related to this function
         reward, terminated, change_reward_function = self.reward_function.get_reward(observation)
         if change_reward_function:
             self.reward_function = self.reward_function_loader.get_next_reward_function()
@@ -67,6 +63,9 @@ class DroneEnv(Env):
 
     def is_truncated(self):
         return self.drone.is_sim_out()
+
+    def close(self):
+        self.drone.end_simulation()
 
     def get_obs(self):
         return self.drone.receive()

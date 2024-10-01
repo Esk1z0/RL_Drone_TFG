@@ -85,7 +85,7 @@ class DroneServer:
         finally:
             self.reception_running = False
 
-    def actions(self, tag, params):
+    def actions(self, tag, params:np.float32):
         if tag == "SET_ALL_MOTORS":
             motor_rl = self.devices['rear left propeller']
             motor_rr = self.devices['rear right propeller']

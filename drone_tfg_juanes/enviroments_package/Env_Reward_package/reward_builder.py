@@ -26,13 +26,16 @@ class RewardLoader:
             return None
 
     def _load_single_package(self, reward_function):
+        rewards = self._build_tests(reward_function["tests"])
         return Reward_Runner(
             name=reward_function["name"],
             info=reward_function["info"],
             alpha=reward_function["alpha"],
+            max_time=reward_function["max_time"],
             final_reward=reward_function["final_reward"],
             command=reward_function["command"],
-            rewards=self._build_tests(reward_function["tests"])
+            rewards=rewards,
+            last_function=self.current_package_index == (len(self.packages) - 1)
         )
 
     def _build_tests(self, tests):

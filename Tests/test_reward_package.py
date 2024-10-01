@@ -26,18 +26,21 @@ class MyTestCase(unittest.TestCase):
     def test_info_reward_runner(self):
         loader = RewardLoader(json_path)
         loader.load_packages()
-        print(loader.get_next_reward_function().reward_command())
+        function = loader.get_next_reward_function()
+        print(function.reward_command())
 
     def test_timer_reward(self):
 
-        loader = RewardLoader(json_timer_path)
+        loader = RewardLoader(json_path)
         loader.load_packages()
         reward_timer_package = loader.get_next_reward_function()
         reward_timer_package.start_reward({})
 
+        print(reward_timer_package.last_function)
+
         for _ in range(6):
             print(reward_timer_package.get_reward({}))
-            time.sleep(1)
+            time.sleep(2)
 
         self.assertEqual(True, True)
 

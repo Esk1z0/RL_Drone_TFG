@@ -20,7 +20,7 @@ class RewardNoRoll(RewardStrategyInterface):
         pass
 
     def get_reward(self, obs: dict, time) -> (int, bool, bool):
-        pass
+        return 1, False, True
 
     def teardown(self):
         pass
