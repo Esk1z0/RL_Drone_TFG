@@ -1,4 +1,5 @@
 from .reward_basic import RewardStrategyInterface
+import numpy as np
 
 
 class RewardNoRoll(RewardStrategyInterface):
@@ -9,6 +10,8 @@ class RewardNoRoll(RewardStrategyInterface):
 
     def __init__(self, max_angle=0):
         self.max_angle = max_angle
+        self.max_reward = 3
+        self.vertical_q = np.array([0, 0, 0, 1])
 
     def __str__(self):
         string = "name: No Roll" \
@@ -20,7 +23,44 @@ class RewardNoRoll(RewardStrategyInterface):
         pass
 
     def get_reward(self, obs: dict, time) -> (int, bool, bool):
-        return 1, False, True
+        reward, terminated, finish = 0, False, True
+        q2 = obs["inertial unit"]
+        angle = self._quaternion_shortest_angle(self.vertical_q, q2)
+        reward = self._calculate_angle_reward(angle)
+        if reward == -1:
+            terminated, finish = True, False
+        return reward, terminated, finish
 
     def teardown(self):
         pass
+
+    def _quaternion_shortest_angle(self, q1, q2):
+        """
+        Calcula el ángulo más corto en grados entre dos cuaterniones.
+        """
+        # Convertir a arrays de NumPy y normalizar los cuaterniones
+        q1 = np.array(q1, dtype=np.float64)
+        q2 = np.array(q2, dtype=np.float64)
+        q1 /= np.linalg.norm(q1)
+        q2 /= np.linalg.norm(q2)
+
+        # Calcular el producto punto absoluto
+        dot_product = abs(np.dot(q1, q2))
+        # Asegurar que el valor esté en el rango válido [-1, 1] para arccos
+        dot_product = np.clip(dot_product, -1.0, 1.0)
+
+        # Calcular el ángulo
+        angle_rad = 2 * np.arccos(dot_product)
+        angle_deg = np.degrees(angle_rad)
+
+        # Asegurar que el ángulo esté en el rango [0, 180]
+        if angle_deg > 180:
+            angle_deg = 360 - angle_deg
+
+        return angle_deg
+
+    def _calculate_angle_reward(self, angle_deg):
+        reward = -1
+        if angle_deg <= self.max_angle:
+            reward = self.max_reward * (1 - (angle_deg / self.max_angle))
+        return reward

@@ -44,6 +44,25 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(True, True)
 
+    def test_change_of_rewards(self):
+        loader = RewardLoader(json_path)
+        loader.load_packages()
+        reward_package = loader.get_next_reward_function()
+        reward_package.start_reward({})
+
+        reward, terminated, change = 0, False, False
+
+        while not terminated:
+            while not change and not terminated:
+                print(reward_package.last_function)
+                reward, terminated, change = reward_package.get_reward({})
+                print(reward, terminated, change)
+                time.sleep(2)
+            print("a")
+            reward_package = loader.get_next_reward_function()
+            reward_package.start_reward({})
+            change = False
+        self.assertEqual(True, True)
 
 if __name__ == '__main__':
     unittest.main()

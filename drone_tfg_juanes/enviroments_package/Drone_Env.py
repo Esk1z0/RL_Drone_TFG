@@ -59,6 +59,7 @@ class DroneEnv(Env):
         reward, terminated, change_reward_function = self.reward_function.get_reward(observation)
         if change_reward_function:
             self.reward_function = self.reward_function_loader.get_next_reward_function()
+            self.reward_function.start_reward(observation)
         return reward, terminated
 
     def is_truncated(self):

@@ -18,7 +18,7 @@ class RewardLoader:
         self.current_package_index = -1
 
     def get_next_reward_function(self):
-        self.current_package_index += 1
+        self.current_package_index = self.current_package_index + 1
         if self.current_package_index < len(self.packages):
             package = self.packages[self.current_package_index]
             return self._load_single_package(package["reward_function"])
@@ -30,7 +30,6 @@ class RewardLoader:
         return Reward_Runner(
             name=reward_function["name"],
             info=reward_function["info"],
-            alpha=reward_function["alpha"],
             max_time=reward_function["max_time"],
             final_reward=reward_function["final_reward"],
             command=reward_function["command"],

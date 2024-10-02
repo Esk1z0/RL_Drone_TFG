@@ -6,7 +6,7 @@
       "alpha": 0.98,
       "final_reward": 100000,
       "command": 1,
-      "max_time": 10,
+      "max_time": 5,
       "tests": [
         {
           "name": "no_roll",
@@ -22,7 +22,7 @@
       "alpha": 0.98,
       "final_reward": 100000,
       "command": 0,
-      "max_time": 10,
+      "max_time": 5,
       "tests": [
         {
           "name": "no_roll",

@@ -2,22 +2,19 @@ from time import perf_counter
 
 
 class Reward_Runner:
-    def __init__(self, name="", info="", alpha=0.99, max_time=1, final_reward=0, command=0, rewards=[], last_function=False):
+    def __init__(self, name="", info="", max_time=1, final_reward=0, command=0, rewards=[], last_function=False):
         self.rewards = rewards
         self.name = name
         self.info = info
-        self.alpha = alpha
         self.max_time = max_time
         self.command = command
         self.final_reward = final_reward
         self.last_function = last_function
-
         self.start_time = 0
 
     def __str__(self):
         string = f"REWARD FUNCTION\nname: {self.name}\n" \
                  f"info: {self.info}\n" \
-                 f"discount: {self.alpha}\n" \
                  f"max_time: {self.max_time}\n" \
                  f"final_reward: {self.final_reward}\n" \
                  f"command: {self.command}\n" \

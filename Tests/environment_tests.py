@@ -1,5 +1,8 @@
 import unittest
 import time
+
+import numpy as np
+
 from drone_tfg_juanes.enviroments_package.Drone_Env import DroneEnv
 
 world_dir = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/simulation_package/worlds/my_frst_webots_world.wbt"
@@ -58,11 +61,25 @@ class MyTestCase(unittest.TestCase):
     def test_reward_function(self):
         env = DroneEnv(world_dir, json_path)
         env.reset()
-        print(env.action_space.sample()[0])
-        time.sleep(5)
+        action = [100, 100, 100, 100]
+        for i in range(150):
+            action = env.action_space.sample() if i % 20 == 0 else action
+            observation, reward, terminated, truncated, info = env.step(action)
+            print(reward, terminated)
+            if terminated or truncated:
+                observation, info = env.reset()
         env.close()
-        assert (True, True)
 
+    def test_nada(self):
+        env = DroneEnv(world_dir, json_path)
+        env.reset()
+        action = np.array([500, 500, 500, 500])
+        for i in range(50):
+            observation, reward, terminated, truncated, info = env.step(action)
+            print(reward)
+            if terminated or truncated:
+                observation, info = env.reset()
+        env.close()
 
 if __name__ == '__main__':
     unittest.main()
