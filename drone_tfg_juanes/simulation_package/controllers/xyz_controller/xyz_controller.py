@@ -66,7 +66,8 @@ class DroneServer:
                 "left distance sensor": self.devices["left distance sensor"].getValue(),
                 "right distance sensor": self.devices["right distance sensor"].getValue(),
                 "altimeter": self.devices["altimeter"].getValue(),
-                "accelerometer": self.devices["accelerometer"].getValues()
+                "accelerometer": self.devices["accelerometer"].getValues(),
+                "gps": self.devices["GPS"].getValues()
             }))
         except:
             pass

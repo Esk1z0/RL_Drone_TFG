@@ -43,6 +43,16 @@ class MyTestCase(unittest.TestCase):
         env.close()
         assert (True, True)
 
+    def test_two_step_observation(self):
+        env = DroneEnv(world_dir, json_path)
+        env.reset()
+        observation, reward, terminated, truncated, info = env.step(action=env.action_space.sample())
+        print(observation["gps"])
+        time.sleep(5)
+        observation, reward, terminated, truncated, info = env.step(action=env.action_space.sample())
+        print(observation["gps"])
+        env.close()
+        assert (True, True)
 
     def test_100step_cycle(self):
         env = DroneEnv(world_dir, json_path)
@@ -50,7 +60,7 @@ class MyTestCase(unittest.TestCase):
         action = [100, 100, 100, 100]
         print(observation)
         for i in range(100):
-            action = env.action_space.sample() if i%20 == 0 else action
+            action = env.action_space.sample() if i % 20 == 0 else action
             observation, reward, terminated, truncated, info = env.step(action)
 
             if terminated or truncated:

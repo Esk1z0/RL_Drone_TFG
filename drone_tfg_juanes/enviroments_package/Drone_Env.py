@@ -14,6 +14,7 @@ class DroneEnv(Env):
             "right distance sensor": spaces.Box(low=0, high=1, dtype=np.float32),
             "altimeter": spaces.Box(low=0, high=np.inf, dtype=np.float32),
             "accelerometer": spaces.Box(low=-np.inf, high=np.inf, shape=(4,), dtype=np.float32),
+            "gps": spaces.Box(low=-np.inf, high=np.inf, shape=(3,), dtype=np.float32),
             "command": spaces.MultiBinary(8)
         })
         self.action_space = spaces.Box(low=0, high=200, shape=(4,), dtype=np.float32)

@@ -58,7 +58,8 @@ def get_next_instance_name(is_client=True):
     return request_name, response_name
 
 
-SENSORS = ["camera", "inertial unit", "left distance sensor", "right distance sensor", "altimeter", "accelerometer"]
+SENSORS = ["camera", "inertial unit", "left distance sensor",
+           "right distance sensor", "altimeter", "accelerometer", "GPS"]
 ACTUATORS = ["front left propeller", "front right propeller",
              "rear left propeller", "rear right propeller"]
 
