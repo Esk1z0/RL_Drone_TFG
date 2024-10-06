@@ -8,6 +8,8 @@ from drone_tfg_juanes.enviroments_package.Drone_Env import DroneEnv
 world_dir = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/simulation_package/worlds/my_frst_webots_world.wbt"
 json_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/enviroments_package/Env_Reward_package/reward_package_config/test_takeoff.json"
 json_zone_no_roll_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/enviroments_package/Env_Reward_package/reward_package_config/test_zone_no_roll.json"
+json_take_off = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/enviroments_package/Env_Reward_package/reward_package_config/takeoff.json"
+
 
 class MyTestCase(unittest.TestCase):
     def test_something(self):
@@ -94,6 +96,17 @@ class MyTestCase(unittest.TestCase):
 
     def test_nada(self):
         env = DroneEnv(world_dir, json_path)
+        env.reset()
+        action = np.array([500, 500, 500, 500])
+        for i in range(50):
+            observation, reward, terminated, truncated, info = env.step(action)
+            print(reward)
+            if terminated or truncated:
+                observation, info = env.reset()
+        env.close()
+
+    def test_takeoff(self):
+        env = DroneEnv(world_dir, json_take_off)
         env.reset()
         action = np.array([500, 500, 500, 500])
         for i in range(50):

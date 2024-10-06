@@ -13,7 +13,6 @@ class RewardTimer(RewardStrategyInterface):
         self.max_reward = 1
         self.start_time = 0
 
-
     def __str__(self):
         string = "name: Timer" \
                  "\ndescription: It sets the maximum time the drone can take to reach its goal"

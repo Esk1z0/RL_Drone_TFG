@@ -42,15 +42,11 @@ class Reward_Runner:
             finish_reward_function = finish_aux if not finish_aux else finish_reward_function
 
         if self._time_out(actual_time):
-            if finish_reward_function:
-                reward += self.final_reward
-                terminated = terminated or self.last_function
-                finish_reward_function = not self.last_function
-            else:
-                reward = 0
-                terminated = False
-        else:
-            finish_reward_function = False
+            terminated = True
+            reward = self.final_reward if finish_reward_function else 0
+        elif finish_reward_function and self.last_function:
+            terminated = True
+            reward = self.final_reward
 
         return reward, terminated, finish_reward_function
 
