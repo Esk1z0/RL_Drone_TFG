@@ -12,6 +12,12 @@
           "parameters": {
             "max_angle": 10
           }
+        },
+        {
+          "name": "zone",
+          "parameters": {
+            "max_distance": 1
+          }
         }
       ]
     }},

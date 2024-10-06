@@ -12,6 +12,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/toys/protos/RubberDuck.proto"
 
 WorldInfo {
+  gpsReference 1 1 1
 }
 Viewpoint {
   orientation -0.0417682972604252 -0.9839755071973808 0.17334246617497445 6.078661552034143

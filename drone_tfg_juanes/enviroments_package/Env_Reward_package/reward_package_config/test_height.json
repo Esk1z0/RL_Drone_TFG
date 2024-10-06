@@ -8,9 +8,11 @@
       "max_time": 5,
       "tests": [
         {
-          "name": "no_roll",
+          "name": "reach_height",
           "parameters": {
-            "max_angle": 10
+            "min_altitude": 2,
+            "max_altitude": 2.1,
+            "max_time": 1
           }
         }
       ]
