@@ -1,5 +1,5 @@
 import subprocess
-from .config import BASE_COMMAND, FLAGS
+from config import BASE_COMMAND, FLAGS
 from threading import Event, Thread
 
 

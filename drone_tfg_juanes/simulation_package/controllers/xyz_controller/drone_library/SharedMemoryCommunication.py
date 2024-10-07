@@ -2,7 +2,7 @@ from threading import Event
 import mmap
 import pickle
 
-from .Mmap_Semaphore import BinarySemaphore
+from Mmap_Semaphore import BinarySemaphore
 
 
 class Comm:

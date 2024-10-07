@@ -1,14 +1,29 @@
 FROM cyberbotics/webots:R2023b-ubuntu22.04
-FROM continuumio/miniconda3 AS build
 
-COPY . /home/app
+# Actualizar los repositorios e instalar Python 3.10 y pip
+RUN apt-get update && \
+    apt-get install -y python3.10 python3-pip && \
+    ln -s /usr/bin/python3.10 /usr/bin/python
 
-RUN conda install -c conda-forge --file /home/app/configs/conda_config/requirements.txt
+# Copiar el proyecto al contenedor
+COPY . /home/drone_tfg_juanes
 
-WORKDIR /home/app
+# Establecer el directorio de trabajo
+WORKDIR /home/drone_tfg_juanes
 
+# Instalar las dependencias usando pip
+RUN pip install -r configs/conda_config/requirements.txt
+
+# Instalar los paquetes locales en modo editable
+RUN pip install -e .
+RUN pip install -e ./simulation_package/controllers/xyz_controller/drone_library
+
+# Configurar el PYTHONPATH
+ENV PYTHONPATH="/home/drone_tfg_juanes:${PYTHONPATH}"
+
+# Exponer los puertos (si es necesario)
 EXPOSE 8000
 EXPOSE 8001
-VOLUME /home/app/data
 
+# Comando por defecto
 CMD ["python", "run_simulation.py"]

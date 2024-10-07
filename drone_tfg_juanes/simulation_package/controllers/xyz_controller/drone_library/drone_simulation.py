@@ -2,9 +2,9 @@ from queue import Queue
 from threading import Event, Thread
 import pickle
 
-from .config import *
-from .SharedMemoryCommunication import Comm
-from .executor import CommandExecutor
+from config import *
+from SharedMemoryCommunication import Comm
+from executor import CommandExecutor
 
 
 class Drone:
