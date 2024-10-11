@@ -3,7 +3,6 @@ import numpy as np
 
 
 class RewardNoRoll(RewardStrategyInterface):
-
     @staticmethod
     def class_name():
         return "no_roll"
