@@ -20,6 +20,8 @@ class CommandExecutor:
             fast (bool): Use the flag --mode=fast to set the speed to fast on the simulation
             no_rendering (bool): Use the flag --no-rendering to disable the graphics on the simulation, any camera will
             be rendered anyway
+            stdout (bool): Use the flag --stdout to redirect the webots terminal output to the launching terminal
+            stderr (bool): Use the flag --stderr to redirect webots errors to the launching terminal
             minimize (bool): Use the flag --minimize to not open the simulation on the screen
         """
         if not file_dir:

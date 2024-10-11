@@ -40,7 +40,7 @@ class MyTestCase(unittest.TestCase):
         print(reward_timer_package.last_function)
 
         for _ in range(6):
-            print(reward_timer_package.get_reward({}))
+            print(reward_timer_package._get_reward({}))
             time.sleep(2)
 
         self.assertEqual(True, True)
@@ -56,7 +56,7 @@ class MyTestCase(unittest.TestCase):
         while not terminated:
             while not change and not terminated:
                 print(reward_package.last_function)
-                reward, terminated, change = reward_package.get_reward({})
+                reward, terminated, change = reward_package._get_reward({})
                 print(reward, terminated, change)
                 time.sleep(2)
             print("a")
@@ -71,10 +71,10 @@ class MyTestCase(unittest.TestCase):
         reward_zone_package = loader.get_next_reward_function()
         reward_zone_package.start_reward({"gps": [0, 0, 0]})
 
-        print(reward_zone_package.get_reward({"gps": [0.5, 0, 3]}))
-        print(reward_zone_package.get_reward({"gps": [0, 0.7, 3]}))
-        print(reward_zone_package.get_reward({"gps": [0.7, 0.7, 3]}))
-        print(reward_zone_package.get_reward({"gps": [1, 0.7, 3]}))
+        print(reward_zone_package._get_reward({"gps": [0.5, 0, 3]}))
+        print(reward_zone_package._get_reward({"gps": [0, 0.7, 3]}))
+        print(reward_zone_package._get_reward({"gps": [0.7, 0.7, 3]}))
+        print(reward_zone_package._get_reward({"gps": [1, 0.7, 3]}))
         time.sleep(0.1)
 
         self.assertEqual(True, True)
@@ -85,12 +85,12 @@ class MyTestCase(unittest.TestCase):
         reward_zone_package = loader.get_next_reward_function()
         reward_zone_package.start_reward({"altimeter": 0.4})
 
-        print(reward_zone_package.get_reward({"altimeter": 0.4}))
-        print(reward_zone_package.get_reward({"altimeter": 2.1}))
+        print(reward_zone_package._get_reward({"altimeter": 0.4}))
+        print(reward_zone_package._get_reward({"altimeter": 2.1}))
         time.sleep(6)
-        print(reward_zone_package.get_reward({"altimeter": 2.1}))
+        print(reward_zone_package._get_reward({"altimeter": 2.1}))
         time.sleep(0.1)
-        print(reward_zone_package.get_reward({"altimeter": 2.1}))
+        print(reward_zone_package._get_reward({"altimeter": 2.1}))
 
         self.assertEqual(True, True)
 

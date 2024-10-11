@@ -36,7 +36,7 @@ class Reward_Runner:
         actual_time = perf_counter()
 
         for test in self.rewards:
-            reward_aux, terminated_aux, finish_aux = test.get_reward(obs, actual_time)
+            reward_aux, terminated_aux, finish_aux = test._get_reward(obs)
             reward += reward_aux
             terminated = terminated_aux if terminated_aux else terminated
             finish_reward_function = finish_aux if not finish_aux else finish_reward_function
