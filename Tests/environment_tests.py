@@ -6,9 +6,9 @@ import numpy as np
 from drone_tfg_juanes.enviroments_package.Drone_Env import DroneEnv
 
 world_dir = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/simulation_package/worlds/my_frst_webots_world.wbt"
-json_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/enviroments_package/Env_Reward_package/reward_package_config/test_takeoff.json"
-json_zone_no_roll_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/enviroments_package/Env_Reward_package/reward_package_config/test_zone_no_roll.json"
-json_take_off = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/enviroments_package/Env_Reward_package/reward_package_config/takeoff.json"
+json_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/configs/reward_package_config/test_takeoff.json"
+json_zone_no_roll_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/configs/reward_package_config/test_zone_no_roll.json"
+json_take_off = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/configs/reward_package_config/takeoff.json"
 
 
 class MyTestCase(unittest.TestCase):

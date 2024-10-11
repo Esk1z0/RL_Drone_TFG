@@ -69,7 +69,10 @@ FLAGS = {
     "realtime": " --mode=realtime",
     "fast": "--mode=fast",
     "no_rendering": " --no-rendering",
-    "minimize": " --minimize"
+    "minimize": " --minimize",
+    "stdout": " --stdout",
+    "stderr": " --stderr"
 }
 
-BASE_COMMAND = "webots"
+WIN_BASE_COMMAND = "webots"
+LINUX_BASE_COMMAND = "xvfb-run webots"

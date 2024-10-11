@@ -1,6 +1,7 @@
 import subprocess
-from config import BASE_COMMAND, FLAGS
+from config import WIN_BASE_COMMAND, LINUX_BASE_COMMAND, FLAGS
 from threading import Event, Thread
+import platform
 
 
 class CommandExecutor:
@@ -27,7 +28,10 @@ class CommandExecutor:
             raise ValueError("The attribute 'simulation_out_event' is mandatory")
 
         self.simulation_out = simulation_out_event
-        self.command = BASE_COMMAND
+        if platform.system() == "Windows":
+            self.command = WIN_BASE_COMMAND
+        else:
+            self.command = LINUX_BASE_COMMAND
 
         for flag, value in kwargs.items():
             if flag in FLAGS and value:
@@ -45,7 +49,7 @@ class CommandExecutor:
         def run_command():
             try:
                 result = subprocess.run(self.command, shell=True, capture_output=True, text=True)
-                print(f"Result: {result.stdout}")
+                print(f"WEBOTS Result: {result.stdout}")
                 print(f"Result Code: {result.returncode}")
             except subprocess.CalledProcessError as e:
                 print(f"Error: {e.stderr}")
