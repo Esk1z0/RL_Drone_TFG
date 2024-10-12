@@ -1,6 +1,5 @@
 FROM cyberbotics/webots:R2023b-ubuntu22.04
 
-
 # Actualizar los repositorios e instalar Python 3.10 y pip
 RUN apt-get update && \
     apt-get install -y python3.10 python3-pip && \
