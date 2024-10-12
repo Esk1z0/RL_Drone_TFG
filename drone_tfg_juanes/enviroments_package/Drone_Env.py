@@ -25,7 +25,7 @@ class DroneEnv(Env):
         })
         self.action_space = spaces.Box(low=0, high=200, shape=(4,), dtype=np.float32)
 
-        self.drone = Drone(simulation_path, batch=True, realtime=True, stdout=True, stderr=True)
+        self.drone = Drone(simulation_path, batch=True, realtime=True, stdout=True, stderr=True, no_rendering=True)
         self.motors = [0, 0, 0, 0]
         self.drone.start_simulation()
 

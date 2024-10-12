@@ -1,5 +1,6 @@
 FROM cyberbotics/webots:R2023b-ubuntu22.04
 
+
 # Actualizar los repositorios e instalar Python 3.10 y pip
 RUN apt-get update && \
     apt-get install -y python3.10 python3-pip && \
@@ -12,22 +13,11 @@ COPY . /home/drone_tfg_juanes
 WORKDIR /home/drone_tfg_juanes
 
 # Instalar las dependencias usando pip
-RUN pip install -r configs/conda_config/requirements.txt
+RUN pip install -r configs/requirements_config/requirements.txt
 
 # Instalar los paquetes locales en modo editable
 RUN pip install -e .
 RUN pip install -e ./simulation_package/controllers/xyz_controller/drone_library
-
-
-
-# Configurar el PYTHONPATH
-ENV PATH="/usr/local/webots/:${PATH}"
-ENV PATH="/usr/local/webots:${PATH}"
-ENV PATH="/usr/local/webots/bin:${PATH}"
-ENV PATH="/usr/local/webots/bin/:${PATH}"
-ENV PYTHONPATH="/home/drone_tfg_juanes:${PYTHONPATH}"
-ENV PYTHONPATH="/usr/local/webots:${PYTHONPATH}"
-ENV PYTHONPATH="/usr/local/webots/lib/controller/python/controller:${PYTHONPATH}"
 
 # Exponer los puertos (si es necesario)
 EXPOSE 8000
