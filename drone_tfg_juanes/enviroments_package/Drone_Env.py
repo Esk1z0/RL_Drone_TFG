@@ -6,7 +6,7 @@ from gymnasium import Env, spaces
 
 class DroneEnv(Env):
     """This class encapsulates the simulation_package to fit the gymnasium environment usage for training the agent"""
-    def __init__(self, simulation_path, reward_json_path):
+    def __init__(self, simulation_path, reward_json_path, no_render=True):
         """It builds the observation and action spaces, loads the reward function and launches the drone simulation
 
             Args:
@@ -26,15 +26,17 @@ class DroneEnv(Env):
         })
         self.action_space = spaces.Box(low=0, high=200, shape=(4,), dtype=np.float32)
 
-        self.drone = Drone(simulation_path, batch=True, realtime=True, stdout=True, stderr=True, no_rendering=True)
+        self.drone = Drone(simulation_path, batch=True, realtime=True, stdout=True, stderr=True, no_rendering=no_render)
         self.motors = [0, 0, 0, 0]
-        self.drone.start_simulation()
+        #self.drone.start_simulation()
 
         self.reward_function_loader = RewardLoader(reward_json_path)
         self.reward_function_loader.load_packages()
         self.reward_function = None
 
         self.terminated = False
+
+        self.first_reset = True
 
     def step(self, action) -> (dict, float, bool, bool, None):
         """Updates the environments with an action and returns the reward and observation asociated, also it returns if
@@ -70,6 +72,11 @@ class DroneEnv(Env):
                 options (object): It is useless with this environment, don't use it
         """
         super().reset(seed=None)
+
+        if self.drone.is_sim_out() or self.first_reset:
+            self.first_reset = False
+            self.drone.start_simulation()
+
         self.reward_function_loader.restart()
         self.reward_function = self.reward_function_loader.get_next_reward_function()
 

@@ -106,7 +106,7 @@ class MyTestCase(unittest.TestCase):
         env.close()
 
     def test_takeoff(self):
-        env = DroneEnv(world_dir, json_take_off)
+        env = DroneEnv(world_dir, json_take_off, no_render=False)
         env.reset()
         action = np.array([500, 500, 500, 500])
         for i in range(50):
