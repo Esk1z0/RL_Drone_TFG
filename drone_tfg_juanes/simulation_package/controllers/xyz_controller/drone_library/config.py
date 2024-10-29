@@ -1,7 +1,7 @@
 import os
 
 # Constantes xyz_controller
-TIME_OUT = 15
+TIME_OUT = 30
 TIME_STEP = 10
 
 SHM_SIZE = 2048
@@ -14,7 +14,7 @@ CONFIG_DIR = os.path.join(os.path.dirname(__file__), 'config')
 COUNTER_FILE = os.path.join(CONFIG_DIR, "instance_counter.txt")
 os.makedirs(CONFIG_DIR, exist_ok=True)
 
-COUNTER_THRESHOLD = 100
+COUNTER_THRESHOLD = 1000
 
 if not os.path.exists(COUNTER_FILE):
     with open(COUNTER_FILE, "w") as f:

@@ -40,7 +40,7 @@ class MyTestCase(unittest.TestCase):
     def test_one_step(self):
         env = DroneEnv(world_dir, json_path)
         env.reset()
-        env.step(action=env.action_space.sample())
+        print(env.step(action=env.action_space.sample()))
         time.sleep(5)
         env.close()
         assert (True, True)

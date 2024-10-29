@@ -2,11 +2,11 @@ from drone_simulation import Drone
 from .Env_Reward_package.reward_builder import RewardLoader
 import numpy as np
 from gymnasium import Env, spaces
-
+from collections import OrderedDict
 
 class DroneEnv(Env):
     """This class encapsulates the simulation_package to fit the gymnasium environment usage for training the agent"""
-    def __init__(self, simulation_path, reward_json_path, no_render=True):
+    def __init__(self, simulation_path, reward_json_path, options=None, no_render=True):
         """It builds the observation and action spaces, loads the reward function and launches the drone simulation
 
             Args:
@@ -15,15 +15,16 @@ class DroneEnv(Env):
         """
         #super().__init__()
         self.observation_space = spaces.Dict({
-            "camera": spaces.Box(low=0, high=255, shape=(240, 400), dtype=np.uint8),
+            "camera": spaces.Box(low=0, high=255, shape=(384000,), dtype=np.uint8), #(240, 400 4)
             "inertial unit": spaces.Box(low=-1, high=1, shape=(4,), dtype=np.float32),
             "left distance sensor": spaces.Box(low=0, high=1, dtype=np.float32),
             "right distance sensor": spaces.Box(low=0, high=1, dtype=np.float32),
             "altimeter": spaces.Box(low=0, high=np.inf, dtype=np.float32),
-            "accelerometer": spaces.Box(low=-np.inf, high=np.inf, shape=(4,), dtype=np.float32),
+            "accelerometer": spaces.Box(low=-np.inf, high=np.inf, shape=(3,), dtype=np.float32),
             "gps": spaces.Box(low=-np.inf, high=np.inf, shape=(3,), dtype=np.float32),
             "command": spaces.MultiBinary(8)
         })
+
         self.action_space = spaces.Box(low=0, high=200, shape=(4,), dtype=np.float32)
 
         self.drone = Drone(simulation_path, batch=True, realtime=True, stdout=True, stderr=True, no_rendering=no_render)
@@ -55,7 +56,6 @@ class DroneEnv(Env):
 
         self.drone.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": action})
         observation = self._get_obs()
-        observation["command"] = self.reward_function.reward_command()
 
         truncated = self.is_truncated()
         if not truncated:
@@ -63,7 +63,7 @@ class DroneEnv(Env):
         else:
             self.drone.end_simulation()
 
-        return observation, reward, terminated, truncated, None
+        return observation, reward, terminated, truncated, {}
 
     def reset(self, seed=None, options=None) -> (dict, None):
         """Tells the simulation to reset the drone physics and controller to restart the trainning
@@ -85,7 +85,7 @@ class DroneEnv(Env):
         obs = self._get_obs()
 
         self.reward_function.start_reward(obs)
-        return obs, None
+        return obs, {}
 
     def _get_reward(self, observation) -> (float, bool):
         """Returns the reward depending of the observation and the time from the internal tests and if the episode ended
@@ -107,9 +107,15 @@ class DroneEnv(Env):
 
     def close(self) -> None:
         """Close the simulation at the end of the training to make sure the environment doesn't stay opened"""
-        self.drone.end_simulation()
+        if not self.first_reset:
+            self.drone.end_simulation()
 
     def _get_obs(self) -> dict:
         """Get the state of the environment from the simulation and returns it"""
-        return self.drone.receive()
+        observation = self.drone.receive()
+        observation["command"] = np.array(self.int_to_binary_list(self.reward_function.reward_command()), dtype=np.uint8)
+        return observation
 
+    def int_to_binary_list(self, n, length=8):
+        # Formatear el número a binario con longitud específica
+        return [int(digit) for digit in f"{n:0{length}b}"]
