@@ -1,5 +1,5 @@
 Metadata-Version: 2.1
 Name: enviroments-package
-Version: 0.1
+Version: 1.0
 Requires-Dist: numpy
 Requires-Dist: gymnasium
