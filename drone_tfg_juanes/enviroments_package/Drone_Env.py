@@ -13,6 +13,7 @@ class DroneEnv(Env):
                 simulation_path (str): It tells where the webots simulation will be found
                 reward_json_path (str): It tells where the reward function configuration is
         """
+        #super().__init__()
         self.observation_space = spaces.Dict({
             "camera": spaces.Box(low=0, high=255, shape=(240, 400), dtype=np.uint8),
             "inertial unit": spaces.Box(low=-1, high=1, shape=(4,), dtype=np.float32),
@@ -68,6 +69,7 @@ class DroneEnv(Env):
                 seed (int): It is useless with this environment, don't use it
                 options (object): It is useless with this environment, don't use it
         """
+        super().reset(seed=None)
         self.reward_function_loader.restart()
         self.reward_function = self.reward_function_loader.get_next_reward_function()
 

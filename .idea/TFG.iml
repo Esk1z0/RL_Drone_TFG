@@ -5,9 +5,13 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/drone_tfg_juanes" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/drone_tfg_juanes/simulation_package/controllers/xyz_controller/drone_library" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/drone_tfg_juanes/enviroments_package" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="app_env" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="PackageRequirementsSettings">
+    <option name="requirementsPath" value="C:\Users\jeste\Desktop\Clase\TFG\drone_tfg_juanes\configs\requirements_config\requirements.txt" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="PLAIN" />
