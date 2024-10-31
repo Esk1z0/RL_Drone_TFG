@@ -4,6 +4,9 @@ import time
 import numpy as np
 
 from drone_tfg_juanes.enviroments_package.Drone_Env import DroneEnv
+from drone_tfg_juanes.enviroments_package.Wrappers.RemoveKeyObservationWrapper import RemoveKeyObservationWrapper
+from drone_tfg_juanes.enviroments_package.Wrappers.ScaleActionWrapper import ScaleActionWrapper
+from drone_tfg_juanes.enviroments_package.Wrappers.ScaleRewardWrapper import ScaleRewardWrapper
 
 world_dir = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/simulation_package/worlds/my_frst_webots_world.wbt"
 json_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/configs/reward_package_config/test_takeoff.json"
@@ -108,9 +111,69 @@ class MyTestCase(unittest.TestCase):
     def test_takeoff(self):
         env = DroneEnv(world_dir, json_take_off, no_render=False)
         env.reset()
-        action = np.array([500, 500, 500, 500])
-        for i in range(50):
+
+        for i in range(100):
+            action = np.random.rand(4) * 500
             observation, reward, terminated, truncated, info = env.step(action)
+            print(reward)
+            if terminated or truncated:
+                observation, info = env.reset()
+        env.close()
+
+    def test_observation_wrapper(self):
+        env = DroneEnv(world_dir, json_take_off, no_render=True)
+        env = RemoveKeyObservationWrapper(env, remove_keys=["camera", "gps"])
+        env.reset()
+
+        for i in range(10):
+            action = np.random.rand(4) * 500
+            observation, reward, terminated, truncated, info = env.step(action)
+            print(observation)
+            if terminated or truncated:
+                observation, info = env.reset()
+        env.close()
+
+    def test_action_wrapper(self):
+        env = DroneEnv(world_dir, json_take_off, no_render=True)
+        env = ScaleActionWrapper(env, low=0, high=600)
+        env.reset()
+
+        for i in range(10):
+            action = np.random.rand(4)
+            action = (action*2) - 1
+            print(action)
+            observation, reward, terminated, truncated, info = env.step(action)
+            print(observation)
+            if terminated or truncated:
+                observation, info = env.reset()
+        env.close()
+
+    def test_reward_wrapper(self):
+        env = DroneEnv(world_dir, json_take_off, no_render=True)
+        env = ScaleRewardWrapper(env, scale_factor=0.1)
+        env.reset()
+
+        for i in range(10):
+            action = np.random.rand(4) * 500
+            observation, reward, terminated, truncated, info = env.step(action)
+            print(reward)
+            if terminated or truncated:
+                observation, info = env.reset()
+        env.close()
+
+    def test_all_wrappers(self):
+        env = DroneEnv(world_dir, json_take_off, no_render=True)
+        env = ScaleActionWrapper(env, low=0, high=600)
+        env = RemoveKeyObservationWrapper(env, remove_keys=["camera", "gps"])
+        env = ScaleRewardWrapper(env, scale_factor=0.1)
+        env.reset()
+
+        for i in range(10):
+            action = np.random.rand(4)
+            action = (action * 2) - 1
+            print(action)
+            observation, reward, terminated, truncated, info = env.step(action)
+            print(observation)
             print(reward)
             if terminated or truncated:
                 observation, info = env.reset()

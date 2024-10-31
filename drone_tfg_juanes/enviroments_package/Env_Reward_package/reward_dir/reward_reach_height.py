@@ -37,6 +37,7 @@ class RewardReachHeight(RewardStrategyInterface):
                     terminated = True
                     finish = True
         elif self.start_time != -1:
+            reward = -1
             terminated = True
             finish = False
 

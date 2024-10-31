@@ -3,7 +3,7 @@
     {"reward_function": {
       "name": "takeoff",
       "info": "This reward function measures how well the drone take off and stay for 2 seconds in the air",
-      "final_reward": 100000,
+      "final_reward": 100,
       "command": 1,
       "max_time": 15,
       "tests": [
@@ -11,12 +11,6 @@
           "name": "no_roll",
           "parameters": {
             "max_angle": 10
-          }
-        },
-        {
-          "name": "timer",
-          "parameters": {
-            "max_time": 5
           }
         },
         {
@@ -28,8 +22,8 @@
         {
           "name": "reach_height",
           "parameters": {
-            "min_altitude": 2.1,
-            "max_altitude": 2.2,
+            "min_altitude": 2.2,
+            "max_altitude": 2.3,
             "max_time": 1
           }
         }

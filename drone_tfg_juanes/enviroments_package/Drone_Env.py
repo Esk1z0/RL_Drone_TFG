@@ -107,7 +107,7 @@ class DroneEnv(Env):
 
     def close(self) -> None:
         """Close the simulation at the end of the training to make sure the environment doesn't stay opened"""
-        if not self.first_reset:
+        if not self.drone.is_sim_out():
             self.drone.end_simulation()
 
     def _get_obs(self) -> dict:
