@@ -4,6 +4,9 @@ import pickle
 from controller import Supervisor
 import numpy as np
 
+import os
+import psutil
+
 from drone_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, SHM_SIZE, get_next_instance_name
 
 from drone_library.SharedMemoryCommunication import Comm
@@ -124,6 +127,15 @@ if __name__ == '__main__':
     server = DroneServer()
     try:
         print("Simulation Starting")
+
+        print("ppid", os.getppid())#TODO: borrar
+        simulator_pid = os.getpid()
+        simulator_process = psutil.Process(simulator_pid)
+        parent_process = simulator_process.parent().parent().parent().parent()
+        controller_pid = parent_process.pid
+        print("pid tatarabuelo",controller_pid)
+
+
         server.enable_everything()
         server.main_cycle()
     except Exception as e:

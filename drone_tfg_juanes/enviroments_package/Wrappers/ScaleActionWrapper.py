@@ -4,18 +4,22 @@ import numpy as np
 
 
 class ScaleActionWrapper(gymnasium.ActionWrapper):
-    def __init__(self, env, low=0, high=600):
+    def __init__(self, env, in_low=0, in_high=1, out_low=0, out_high=1):
         super().__init__(env)
-        self.low = low
-        self.high = high
+        self.in_low = in_low
+        self.in_high = in_high
+        self.out_low = out_low
+        self.out_high = out_high
 
-        # Cambiar el espacio de acción para reflejar el rango de PPO
-        self.action_space = spaces.Box(low=-1, high=1, shape=env.action_space.shape, dtype=np.float32)
+        self.f1 = self.out_high - self.out_low
+        self.f2 = self.in_high - self.in_low
+
+        self.action_space = spaces.Box(low=in_low, high=in_high, shape=env.action_space.shape, dtype=np.float32)
 
     def action(self, action):
-        # Reescalar de [-1, 1] al rango [low, high]
-        scaled_action = self.low + (0.5 * (action + 1.0) * (self.high - self.low))
-        return np.clip(scaled_action, self.low, self.high)  # Asegurar que esté en el rango
+
+        action = np.clip(action, self.in_low, self.in_high)
+        return self.out_low + self.f1 * (action - self.in_low) / self.f2
 
     def reverse_action(self, action):
         # Convertir de vuelta al rango [-1, 1] si es necesario

@@ -6,6 +6,8 @@ from config import *
 from SharedMemoryCommunication import Comm
 from executor import CommandExecutor
 
+import os
+
 
 class Drone:
     """
@@ -49,6 +51,9 @@ class Drone:
         """
         self.command_executor.execute()
         self.queue_thread.start()
+        #TODO: borrar abajo
+        print("pidcontroller:", os.getpid())
+
 
     def is_sim_out(self):
         return self.sim_out.is_set()

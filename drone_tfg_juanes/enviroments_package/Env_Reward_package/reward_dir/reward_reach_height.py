@@ -1,4 +1,5 @@
 from .reward_basic import RewardStrategyInterface
+import math
 
 
 class RewardReachHeight(RewardStrategyInterface):
@@ -7,11 +8,12 @@ class RewardReachHeight(RewardStrategyInterface):
     def class_name():
         return "reach_height"
 
-    def __init__(self, min_altitude=1, max_altitude=2, max_time=1):
+    def __init__(self, min_altitude=1, max_altitude=2, max_time=1, decay_rate=0.1):
         self.max_reward = 5
         self.min_altitude = min_altitude
         self.max_altitude = max_altitude
         self.max_time = max_time
+        self.decay_rate = decay_rate
         self.start_time = -1
 
     def __str__(self):
@@ -37,7 +39,7 @@ class RewardReachHeight(RewardStrategyInterface):
                     terminated = True
                     finish = True
         elif self.start_time != -1:
-            reward = -1
+            reward = self.calculate_reward_out_of_range(altitude)
             terminated = True
             finish = False
 
@@ -51,3 +53,12 @@ class RewardReachHeight(RewardStrategyInterface):
 
     def teardown(self):
         pass
+
+    def calculate_reward_out_of_range(self, altitude):
+
+        distance = abs(altitude - ((self.max_altitude+self.min_altitude)/2))
+
+        # Calcular la recompensa usando una función exponencial inversa
+        reward = self.max_reward * math.exp(-self.decay_rate * distance)
+
+        return reward

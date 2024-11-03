@@ -135,12 +135,11 @@ class MyTestCase(unittest.TestCase):
 
     def test_action_wrapper(self):
         env = DroneEnv(world_dir, json_take_off, no_render=True)
-        env = ScaleActionWrapper(env, low=0, high=600)
+        env = ScaleActionWrapper(env, in_low=0, in_high=2, out_low=0, out_high=576)
         env.reset()
 
         for i in range(10):
             action = np.random.rand(4)
-            action = (action*2) - 1
             print(action)
             observation, reward, terminated, truncated, info = env.step(action)
             print(observation)
@@ -163,14 +162,13 @@ class MyTestCase(unittest.TestCase):
 
     def test_all_wrappers(self):
         env = DroneEnv(world_dir, json_take_off, no_render=True)
-        env = ScaleActionWrapper(env, low=0, high=600)
+        env = ScaleActionWrapper(env, in_low=0, in_high=2, out_low=0, out_high=576)
         env = RemoveKeyObservationWrapper(env, remove_keys=["camera", "gps"])
         env = ScaleRewardWrapper(env, scale_factor=0.1)
         env.reset()
 
         for i in range(10):
             action = np.random.rand(4)
-            action = (action * 2) - 1
             print(action)
             observation, reward, terminated, truncated, info = env.step(action)
             print(observation)
