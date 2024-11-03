@@ -38,6 +38,7 @@ class DroneEnv(Env):
         self.terminated = False
 
         self.first_reset = True
+        self.closed = False
 
     def step(self, action) -> (dict, float, bool, bool, None):
         """Updates the environments with an action and returns the reward and observation asociated, also it returns if
@@ -73,7 +74,8 @@ class DroneEnv(Env):
         """
         super().reset(seed=None)
 
-        if self.drone.is_sim_out() or self.first_reset:
+        if self.drone.is_sim_out() or self.first_reset or self.closed:
+            self.closed = True
             self.first_reset = False
             self.drone.start_simulation()
 
@@ -109,6 +111,7 @@ class DroneEnv(Env):
         """Close the simulation at the end of the training to make sure the environment doesn't stay opened"""
         if not self.drone.is_sim_out():
             self.drone.end_simulation()
+        self.closed = True
 
     def _get_obs(self) -> dict:
         """Get the state of the environment from the simulation and returns it"""

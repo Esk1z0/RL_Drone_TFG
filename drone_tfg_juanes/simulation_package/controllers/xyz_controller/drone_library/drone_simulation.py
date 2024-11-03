@@ -18,16 +18,23 @@ class Drone:
         """
             Initialize the drone interface, the channel and the simulation
         """
-        REQUEST_MEMORY, RESPONSE_MEMORY = get_next_instance_name(is_client=True)
 
+        process_pid = os.getpid()
+        self.request_memory = f"request_memory_{process_pid}"
+        self.response_memory = f"response_memory_{process_pid}"
         self.webots_dir = webots_dir
+        self.kwargs = kwargs
+        self.threads_init()
+
+    def threads_init(self):
         self.sim_out = Event()
-        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=REQUEST_MEMORY, receiver_name=RESPONSE_MEMORY,
-                            close_event=self.sim_out)
-        self.command_executor = CommandExecutor(self.sim_out, webots_dir, **kwargs)
         self.queue = Queue(maxsize=1)
+
         self.queue_thread = Thread(target=self.queue_func)
 
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=self.request_memory, receiver_name=self.response_memory,
+                            close_event=self.sim_out)
+        self.command_executor = CommandExecutor(self.sim_out, self.webots_dir, **self.kwargs)
 
     def send(self, action):
         self.channel.send(pickle.dumps(action))
@@ -49,11 +56,9 @@ class Drone:
         """
             It starts the thread that calls the simulation command.
         """
+        self.threads_init()
         self.command_executor.execute()
         self.queue_thread.start()
-        #TODO: borrar abajo
-        print("pidcontroller:", os.getpid())
-
 
     def is_sim_out(self):
         return self.sim_out.is_set()

@@ -120,6 +120,30 @@ class MyTestCase(unittest.TestCase):
                 observation, info = env.reset()
         env.close()
 
+
+    def test_takeoff_sequence(self):
+        env = DroneEnv(world_dir, json_take_off, no_render=False)
+        env.reset()
+
+        for i in range(10):
+            action = np.random.rand(4) * 500
+            observation, reward, terminated, truncated, info = env.step(action)
+            print(reward)
+            if terminated or truncated:
+                observation, info = env.reset()
+        env.close()
+        time.sleep(0.1)
+        env.reset()
+
+        for i in range(10):
+            action = np.random.rand(4) * 500
+            observation, reward, terminated, truncated, info = env.step(action)
+            print(reward)
+            if terminated or truncated:
+                observation, info = env.reset()
+        env.close()
+
+
     def test_observation_wrapper(self):
         env = DroneEnv(world_dir, json_take_off, no_render=True)
         env = RemoveKeyObservationWrapper(env, remove_keys=["camera", "gps"])

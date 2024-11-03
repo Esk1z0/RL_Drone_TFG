@@ -7,15 +7,17 @@ import numpy as np
 import os
 import psutil
 
-from drone_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, SHM_SIZE, get_next_instance_name
+from drone_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, SHM_SIZE
 
 from drone_library.SharedMemoryCommunication import Comm
 
 
 class DroneServer:
     def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
-        REQUEST_MEMORY, RESPONSE_MEMORY = get_next_instance_name(is_client=False)
-        print(REQUEST_MEMORY, RESPONSE_MEMORY)
+        process_pid = psutil.Process(os.getpid()).parent().parent().parent().parent().pid
+        request_memory = f"request_memory_{process_pid}"
+        response_memory = f"response_memory_{process_pid}"
+
         self.reception_running = False
         self.sending_running = False
 
@@ -27,7 +29,7 @@ class DroneServer:
         self.devices = {}
 
         self.close_sim = threading.Event()
-        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=RESPONSE_MEMORY, receiver_name=REQUEST_MEMORY,
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=response_memory, receiver_name=request_memory,
                             close_event=self.close_sim)
 
     def main_cycle(self):
@@ -81,9 +83,9 @@ class DroneServer:
     def receive_action(self):
         try:
             action = self.channel.receive()
-            print(action)#TODO borrar
             tag = action["ACTION"]
             params = action["PARAMS"]
+            print(tag, params)
             self.actions(tag, params)
         except:
             pass
@@ -127,15 +129,6 @@ if __name__ == '__main__':
     server = DroneServer()
     try:
         print("Simulation Starting")
-
-        print("ppid", os.getppid())#TODO: borrar
-        simulator_pid = os.getpid()
-        simulator_process = psutil.Process(simulator_pid)
-        parent_process = simulator_process.parent().parent().parent().parent()
-        controller_pid = parent_process.pid
-        print("pid tatarabuelo",controller_pid)
-
-
         server.enable_everything()
         server.main_cycle()
     except Exception as e:
