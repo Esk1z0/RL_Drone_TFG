@@ -17,7 +17,7 @@ class Comm:
         channel with the request_name and response_name swapped.
 
         Args:
-            buffer_size (int): Size of the buffer to pass the data.
+            buffer_size (int): Size of the buffer to pass the data_collected.
             emitter_name (str): Name for the emitter semaphore and buffer.
             receiver_name (str): Name for the receiver semaphore and buffer.
             close_event (Event): Event for when the simulation finishes.
@@ -63,7 +63,7 @@ class Comm:
         Sends the message to the simulator through the shared memory of emitter.
 
         Args:
-            data: Any binary data can be passed.
+            data: Any binary data_collected can be passed.
         """
         self.wait_emitter()
         self.send_start_emitter(data)
@@ -78,10 +78,10 @@ class Comm:
 
     def receive(self):
         """
-           Receives the data sent from the other part and returns it deserialized.
+           Receives the data_collected sent from the other part and returns it deserialized.
 
            Returns:
-               Any: The deserialized data received. If no data is received, returns None.
+               Any: The deserialized data_collected received. If no data_collected is received, returns None.
            """
         data_received = b''
         self.wait_receiver()

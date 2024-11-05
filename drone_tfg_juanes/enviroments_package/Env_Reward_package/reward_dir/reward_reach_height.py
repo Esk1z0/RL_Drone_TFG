@@ -8,8 +8,8 @@ class RewardReachHeight(RewardStrategyInterface):
     def class_name():
         return "reach_height"
 
-    def __init__(self, min_altitude=1, max_altitude=2, max_time=1, decay_rate=0.1):
-        self.max_reward = 5
+    def __init__(self, min_altitude=1, max_altitude=2, max_time=1, decay_rate=0.1, max_reward=1):
+        self.max_reward = max_reward
         self.min_altitude = min_altitude
         self.max_altitude = max_altitude
         self.max_time = max_time

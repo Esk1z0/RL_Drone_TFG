@@ -12,7 +12,7 @@ import os
 class Drone:
     """
         It works as an interface with the simulation in 4 simple functions. It starts the simulation, sends the motor
-        actions, receive the data from the sensors and shutdown the simulation
+        actions, receive the data_collected from the sensors and shutdown the simulation
     """
     def __init__(self, webots_dir, **kwargs):
         """
@@ -24,7 +24,13 @@ class Drone:
         self.response_memory = f"response_memory_{process_pid}"
         self.webots_dir = webots_dir
         self.kwargs = kwargs
-        self.threads_init()
+
+        self.sim_out = None
+        self.queue = None
+        self.queue_thread = None
+        self.channel = None
+        self.command_executor = None
+        #self.threads_init()
 
     def threads_init(self):
         self.sim_out = Event()

@@ -129,6 +129,7 @@ if __name__ == '__main__':
     server = DroneServer()
     try:
         print("Simulation Starting")
+        print("pid:", psutil.Process(os.getpid()).parent().parent().parent().parent().pid)
         server.enable_everything()
         server.main_cycle()
     except Exception as e:

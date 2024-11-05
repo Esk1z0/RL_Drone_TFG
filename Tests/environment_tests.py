@@ -172,7 +172,7 @@ class MyTestCase(unittest.TestCase):
         env.close()
 
     def test_reward_wrapper(self):
-        env = DroneEnv(world_dir, json_take_off, no_render=True)
+        env = DroneEnv(world_dir, json_take_off, no_render=False)
         env = ScaleRewardWrapper(env, scale_factor=0.1)
         env.reset()
 
@@ -180,7 +180,7 @@ class MyTestCase(unittest.TestCase):
             action = np.random.rand(4) * 500
             observation, reward, terminated, truncated, info = env.step(action)
             print(reward)
-            if terminated or truncated:
+            if terminated :
                 observation, info = env.reset()
         env.close()
 
@@ -200,6 +200,42 @@ class MyTestCase(unittest.TestCase):
             if terminated or truncated:
                 observation, info = env.reset()
         env.close()
+
+    def test_vec_env(self):
+        from stable_baselines3.common.vec_env import DummyVecEnv
+
+        def make_env():
+            return DroneEnv(world_dir, json_take_off, no_render=True)
+
+        num_envs = 4  # Número de entornos en paralelo
+        env = DummyVecEnv([make_env]*num_envs)
+
+        time.sleep(5)
+        # Resetea el entorno vectorizado
+        observations = env.reset()
+
+        # Ciclo para probar el entorno con reset y step
+        for _ in range(10):  # Cambia el número de iteraciones según lo necesites
+            # Genera acciones aleatorias para cada entorno en paralelo
+            actions = np.array([env.action_space.sample() for _ in range(num_envs)])
+
+            observations, rewards, dones, infos = env.step(actions)
+            print("Observaciones:", observations)
+            print("Recompensas:", rewards)
+            print("Terminado:", dones)
+            print("Infos:", infos)
+
+            # Resetea solo los entornos que hayan terminado
+            if any(dones):
+                observations = env.reset()  # Esto reinicia solo los entornos terminados
+
+            # Puedes agregar una pausa si es necesario para observar los cambios
+            time.sleep(0.1)
+
+        # Cierra el entorno al terminar
+        env.close()
+
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -10,13 +10,15 @@
         {
           "name": "no_roll",
           "parameters": {
-            "max_angle": 10
+            "max_angle": 10,
+            "max_reward": 6
           }
         },
         {
           "name": "zone",
           "parameters": {
-            "max_distance": 1
+            "max_distance": 1,
+            "max_reward": 2
           }
         },
         {
@@ -24,7 +26,8 @@
           "parameters": {
             "min_altitude": 2.2,
             "max_altitude": 2.3,
-            "max_time": 1
+            "max_time": 1,
+            "max_reward": 8
           }
         }
       ]

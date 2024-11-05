@@ -7,9 +7,9 @@ class RewardNoRoll(RewardStrategyInterface):
     def class_name():
         return "no_roll"
 
-    def __init__(self, max_angle=0):
+    def __init__(self, max_angle=0, max_reward=1):
         self.max_angle = max_angle
-        self.max_reward = 3
+        self.max_reward = max_reward
         self.vertical_q = np.array([0, 0, 0, 1])
 
     def __str__(self):

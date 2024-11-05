@@ -74,7 +74,7 @@ class DroneEnv(Env):
         """
         super().reset(seed=None)
 
-        if self.drone.is_sim_out() or self.first_reset or self.closed:
+        if self.first_reset or self.closed or self.drone.is_sim_out():
             self.closed = False
             self.first_reset = False
             self.drone.start_simulation()

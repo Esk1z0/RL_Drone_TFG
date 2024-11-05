@@ -8,9 +8,9 @@ class RewardZone(RewardStrategyInterface):
     def class_name():
         return "zone"
 
-    def __init__(self, max_distance=1):
+    def __init__(self, max_distance=1, max_reward=1):
         self.max_distance = max_distance
-        self.max_reward = 5
+        self.max_reward = max_reward
         self.origin = np.array([0, 0])
 
     def __str__(self):

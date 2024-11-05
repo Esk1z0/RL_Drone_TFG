@@ -193,7 +193,7 @@ dependencies:
     - rsa==4.9
     - scipy==1.11.1
     - tensorboard==2.10.1
-    - tensorboard-data-server==0.6.1
+    - tensorboard-data_collected-server==0.6.1
     - tensorboard-plugin-wit==1.8.1
     - tensorflow==2.10.0
     - tensorflow-estimator==2.10.0
