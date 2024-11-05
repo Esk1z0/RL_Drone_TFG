@@ -14,9 +14,11 @@ from drone_library.SharedMemoryCommunication import Comm
 
 class DroneServer:
     def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
-        process_pid = psutil.Process(os.getpid()).parent().parent().parent().parent().pid
-        request_memory = f"request_memory_{process_pid}"
-        response_memory = f"response_memory_{process_pid}"
+        controller_pid = psutil.Process(os.getpid()).parent().parent().parent().parent().pid
+        launcher_pid = psutil.Process(os.getpid()).parent().parent().parent().pid
+        pid = str(controller_pid)+str(launcher_pid)
+        request_memory = f"request_memory_{pid}"
+        response_memory = f"response_memory_{pid}"
 
         self.reception_running = False
         self.sending_running = False
@@ -129,7 +131,6 @@ if __name__ == '__main__':
     server = DroneServer()
     try:
         print("Simulation Starting")
-        print("pid:", psutil.Process(os.getpid()).parent().parent().parent().parent().pid)
         server.enable_everything()
         server.main_cycle()
     except Exception as e:

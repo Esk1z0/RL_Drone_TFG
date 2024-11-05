@@ -1,4 +1,6 @@
 import subprocess
+import time
+
 from config import WIN_BASE_COMMAND, LINUX_BASE_COMMAND, FLAGS
 from threading import Event, Thread
 import platform
@@ -30,6 +32,7 @@ class CommandExecutor:
             raise ValueError("The attribute 'simulation_out_event' is mandatory")
 
         self.simulation_out = simulation_out_event
+        self.simulator_process = None
         if platform.system() == "Windows":
             self.command = WIN_BASE_COMMAND
         else:
@@ -50,9 +53,11 @@ class CommandExecutor:
 
         def run_command():
             try:
-                result = subprocess.run(self.command, shell=True, capture_output=True, text=True)
-                print(f"WEBOTS Result: {result.stdout}")
-                print(f"Result Code: {result.returncode}")
+                self.simulator_process = subprocess.Popen(self.command, shell=True, stdout=subprocess.PIPE,
+                                                          stderr=subprocess.PIPE, text=True)
+                stdout, stderr = self.simulator_process.communicate()
+                print(f"WEBOTS Result: {stdout}")
+                print(f"Result Code: {self.simulator_process.returncode}")
             except subprocess.CalledProcessError as e:
                 print(f"Error: {e.stderr}")
             finally:
@@ -60,3 +65,8 @@ class CommandExecutor:
 
         thread = Thread(target=run_command)
         thread.start()
+
+        while self.simulator_process is None or self.simulator_process.pid is None:
+            time.sleep(0.1)
+
+        return self.simulator_process.pid

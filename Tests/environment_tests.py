@@ -210,7 +210,6 @@ class MyTestCase(unittest.TestCase):
         num_envs = 4  # Número de entornos en paralelo
         env = DummyVecEnv([make_env]*num_envs)
 
-        time.sleep(5)
         # Resetea el entorno vectorizado
         observations = env.reset()
 

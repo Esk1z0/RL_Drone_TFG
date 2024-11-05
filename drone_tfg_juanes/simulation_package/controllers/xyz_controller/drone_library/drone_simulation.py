@@ -30,17 +30,6 @@ class Drone:
         self.queue_thread = None
         self.channel = None
         self.command_executor = None
-        #self.threads_init()
-
-    def threads_init(self):
-        self.sim_out = Event()
-        self.queue = Queue(maxsize=1)
-
-        self.queue_thread = Thread(target=self.queue_func)
-
-        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=self.request_memory, receiver_name=self.response_memory,
-                            close_event=self.sim_out)
-        self.command_executor = CommandExecutor(self.sim_out, self.webots_dir, **self.kwargs)
 
     def send(self, action):
         self.channel.send(pickle.dumps(action))
@@ -62,8 +51,17 @@ class Drone:
         """
             It starts the thread that calls the simulation command.
         """
-        self.threads_init()
-        self.command_executor.execute()
+        self.sim_out = Event()
+        self.queue = Queue(maxsize=1)
+
+        self.queue_thread = Thread(target=self.queue_func)
+
+        self.command_executor = CommandExecutor(self.sim_out, self.webots_dir, **self.kwargs)
+        pid = str(self.command_executor.execute())
+
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=self.request_memory + pid,
+                            receiver_name=self.response_memory + pid,
+                            close_event=self.sim_out)
         self.queue_thread.start()
 
     def is_sim_out(self):
