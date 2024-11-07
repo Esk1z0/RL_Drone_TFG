@@ -26,7 +26,7 @@ class RewardNoRoll(RewardStrategyInterface):
         q2 = obs["inertial unit"]
         angle = self._quaternion_shortest_angle(self.vertical_q, q2)
         reward = self._calculate_angle_reward(angle)
-        if reward == -1:
+        if reward < 0:
             terminated, finish = True, False
         return reward, terminated, finish
 
@@ -59,7 +59,7 @@ class RewardNoRoll(RewardStrategyInterface):
         return angle_deg
 
     def _calculate_angle_reward(self, angle_deg):
-        reward = -1
+        reward = -self.max_reward
         if angle_deg <= self.max_angle:
             reward = self.max_reward * (1 - (angle_deg / self.max_angle))
         return reward
