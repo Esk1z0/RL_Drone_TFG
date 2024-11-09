@@ -1,3 +1,5 @@
+import time
+
 from drone_simulation import Drone
 from .Env_Reward_package.reward_builder import RewardLoader
 import numpy as np
@@ -25,7 +27,7 @@ class DroneEnv(Env):
             "command": spaces.MultiBinary(8)
         })
 
-        self.action_space = spaces.Box(low=0, high=200, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(low=0, high=576, shape=(4,), dtype=np.float32)
 
         self.drone = Drone(simulation_path, batch=True, realtime=True, stdout=True, stderr=True, no_rendering=no_render)
         self.motors = [0, 0, 0, 0]
@@ -54,6 +56,7 @@ class DroneEnv(Env):
         """
         #TODO comprobar si un pequenio delay ayuda al entrenamiento
         reward, terminated, truncated = 0, False, False
+        self.motors = action
 
         self.drone.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": action})
         observation = self._get_obs()
@@ -73,7 +76,7 @@ class DroneEnv(Env):
                 options (object): It is useless with this environment, don't use it
         """
         super().reset(seed=None)
-
+        time.sleep(0.1)
         if self.first_reset or self.closed or self.drone.is_sim_out():
             self.closed = False
             self.first_reset = False
@@ -86,7 +89,7 @@ class DroneEnv(Env):
         self.motors = [0, 0, 0, 0]
         obs = self._get_obs()
 
-        self.reward_function.start_reward(obs)
+        self.reward_function.start_reward(obs, self.motors)
         return obs, {}
 
     def _get_reward(self, observation) -> (float, bool):
@@ -97,10 +100,10 @@ class DroneEnv(Env):
                 reward (float): The reward given to the agent form its actions
                 terminated (bool): The tests can terminate the episode if the drone fail the task
         """
-        reward, terminated, change_reward_function = self.reward_function.get_reward(observation)
+        reward, terminated, change_reward_function = self.reward_function.get_reward(observation,self.motors)
         if change_reward_function and not terminated:
             self.reward_function = self.reward_function_loader.get_next_reward_function()
-            self.reward_function.start_reward(observation)
+            self.reward_function.start_reward(observation, self.motors)
         return reward, terminated
 
     def is_truncated(self) -> bool:
@@ -115,6 +118,7 @@ class DroneEnv(Env):
 
     def _get_obs(self) -> dict:
         """Get the state of the environment from the simulation and returns it"""
+        time.sleep(0.16)
         observation = self.drone.receive()
         observation["command"] = np.array(self.int_to_binary_list(self.reward_function.reward_command()), dtype=np.uint8)
         return observation

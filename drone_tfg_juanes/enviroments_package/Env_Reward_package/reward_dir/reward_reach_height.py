@@ -22,10 +22,10 @@ class RewardReachHeight(RewardStrategyInterface):
                  "height and stays there for a certain time before ending the training"
         return string
 
-    def start_test(self, obs: dict, time) -> None:
+    def start_test(self, obs: dict, motors:list, time) -> None:
         pass
 
-    def get_reward(self, obs: dict, time) -> (int, bool, bool):
+    def get_reward(self, obs: dict, motors:list, time) -> (int, bool, bool):
         altitude = obs["altimeter"]
         in_range = self.within_range(altitude)
         reward, terminated, finish = 0, False, False

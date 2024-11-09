@@ -19,10 +19,10 @@ class RewardZone(RewardStrategyInterface):
                  "its original coordinates. It only measures the horizontal area, not the height"
         return string
 
-    def start_test(self, obs: dict, time) -> None:
+    def start_test(self, obs: dict, motors:list, time) -> None:
         self.origin = np.array(obs["gps"][:-1])
 
-    def get_reward(self, obs: dict, time) -> (int, bool, bool):
+    def get_reward(self, obs: dict, motors:list, time) -> (int, bool, bool):
         reward, terminated, finish = 0, False, True
 
         distance = np.linalg.norm(np.array(obs["gps"][:-1]) - self.origin)

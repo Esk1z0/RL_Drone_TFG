@@ -18,10 +18,10 @@ class RewardTimer(RewardStrategyInterface):
                  "\ndescription: It sets the maximum time the drone can take to reach its goal"
         return string
 
-    def start_test(self, obs: dict, time) -> None:
+    def start_test(self, obs: dict, motors:list, time) -> None:
         self.start_time = time
 
-    def get_reward(self, obs: dict, time) -> (int, bool, bool):
+    def get_reward(self, obs: dict, motors:list, time) -> (int, bool, bool):
         reward, terminated, finish = self.max_reward, False, True
         if self._timeout(time):
             reward, terminated, finish = -1, True, False

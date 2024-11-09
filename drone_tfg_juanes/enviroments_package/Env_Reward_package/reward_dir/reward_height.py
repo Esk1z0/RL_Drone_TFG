@@ -16,10 +16,10 @@ class RewardHeight(RewardStrategyInterface):
                  "it starts penalizing"
         return string
 
-    def start_test(self, obs: dict, time) -> None:
+    def start_test(self, obs: dict, motors:list, time) -> None:
         pass
 
-    def get_reward(self, obs: dict, time) -> (int, bool, bool):
+    def get_reward(self, obs: dict, motors:list, time) -> (int, bool, bool):
         altitude = obs["altimeter"][0]
         reward = 0
         terminated = False

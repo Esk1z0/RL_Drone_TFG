@@ -18,10 +18,10 @@ class RewardNoRoll(RewardStrategyInterface):
                  "so it stays upwards"
         return string
 
-    def start_test(self, obs: dict, time) -> None:
+    def start_test(self, obs: dict, motors:list, time) -> None:
         pass
 
-    def get_reward(self, obs: dict, time) -> (int, bool, bool):
+    def get_reward(self, obs: dict, motors:list, time) -> (int, bool, bool):
         reward, terminated, finish = 0, False, True
         q2 = obs["inertial unit"]
         angle = self._quaternion_shortest_angle(self.vertical_q, q2)

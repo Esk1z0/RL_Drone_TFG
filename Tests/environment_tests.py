@@ -247,5 +247,24 @@ class MyTestCase(unittest.TestCase):
                 observation, info = env.reset()
         env.close()
 
+
+    def test_timeout_rerun(self):
+        from drone_tfg_juanes.simulation_package.controllers.xyz_controller.drone_library.config import TIME_OUT
+        json_basic = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/configs/reward_package_config/basic_no_roll.json"
+        env = DroneEnv(world_dir, json_basic, no_render=False)
+        env.reset()
+
+        time.sleep(TIME_OUT+15)
+        print(env.drone.is_sim_out())
+        env.reset()
+        for i in range(100):
+            action = np.random.rand(4) * 500
+            observation, reward, terminated, truncated, info = env.step(action)
+            print(reward, terminated, truncated)
+            if terminated or truncated:
+                observation, info = env.reset()
+        env.close()
+
+
 if __name__ == '__main__':
     unittest.main()

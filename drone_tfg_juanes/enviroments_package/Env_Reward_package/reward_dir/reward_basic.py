@@ -13,12 +13,12 @@ class RewardStrategyInterface(ABC):
         return "basic_reward_no_use_please"
 
     @abstractmethod
-    def start_test(self, obs: dict, time) -> None:
+    def start_test(self, obs: dict, motors: list, time) -> None:
         """It starts the test with the observations"""
         pass
 
     @abstractmethod
-    def get_reward(self, obs: dict, time) -> (int, bool, bool):
+    def get_reward(self, obs: dict, motors:list, time) -> (int, bool, bool):
         """It returns the discrete reward, if the training failed (is terminated) and if it can finish"""
         pass
 

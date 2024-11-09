@@ -29,13 +29,13 @@ class Reward_Runner:
         """Returns the command associated with the task (drone complex action) for the observation space to the agent"""
         return self.command
 
-    def start_reward(self, obs: dict) -> None:
+    def start_reward(self, obs: dict, motors: list) -> None:
         """Starts the counter for the time dimension calculations and start each test of the reward function"""
         self.start_time = perf_counter()
         for test in self.rewards:
-            test.start_test(obs, self.start_time)
+            test.start_test(obs, motors, self.start_time)
 
-    def get_reward(self, obs) -> (float, bool, bool):
+    def get_reward(self, obs, motors:list) -> (float, bool, bool):
         """Calculate the reward using each test and return if the episode is terminated or the reward function
             Args:
                 obs (dict): The environment observation shared for all tests
@@ -48,7 +48,7 @@ class Reward_Runner:
         actual_time = perf_counter()
 
         for test in self.rewards:
-            reward_aux, terminated_aux, finish_aux = test.get_reward(obs, actual_time)
+            reward_aux, terminated_aux, finish_aux = test.get_reward(obs, motors, actual_time)
             reward += reward_aux
             terminated = terminated_aux if terminated_aux else terminated
             finish_reward_function = finish_aux if not finish_aux else finish_reward_function
