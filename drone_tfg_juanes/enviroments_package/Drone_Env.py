@@ -4,7 +4,7 @@ from drone_simulation import Drone
 from .Env_Reward_package.reward_builder import RewardLoader
 import numpy as np
 from gymnasium import Env, spaces
-from collections import OrderedDict
+
 
 class DroneEnv(Env):
     """This class encapsulates the simulation_package to fit the gymnasium environment usage for training the agent"""
@@ -19,8 +19,6 @@ class DroneEnv(Env):
         self.observation_space = spaces.Dict({
             "camera": spaces.Box(low=0, high=255, shape=(384000,), dtype=np.uint8), #(240, 400 4)
             "inertial unit": spaces.Box(low=-1, high=1, shape=(4,), dtype=np.float32),
-            "left distance sensor": spaces.Box(low=0, high=1, dtype=np.float32),
-            "right distance sensor": spaces.Box(low=0, high=1, dtype=np.float32),
             "altimeter": spaces.Box(low=0, high=np.inf, dtype=np.float32),
             "accelerometer": spaces.Box(low=-np.inf, high=np.inf, shape=(3,), dtype=np.float32),
             "gps": spaces.Box(low=-np.inf, high=np.inf, shape=(3,), dtype=np.float32),
@@ -54,6 +52,11 @@ class DroneEnv(Env):
             truncated (bool): Tells if the simulation crashed for some reason
             info (None): Not implemented
         """
+
+        if self.closed or self.drone.is_sim_out():
+            self.closed = False
+            self.drone.start_simulation()
+
         #TODO comprobar si un pequenio delay ayuda al entrenamiento
         reward, terminated, truncated = 0, False, False
         self.motors = action
@@ -76,7 +79,7 @@ class DroneEnv(Env):
                 options (object): It is useless with this environment, don't use it
         """
         super().reset(seed=None)
-        time.sleep(0.1)
+        time.sleep(0.2)
         if self.first_reset or self.closed or self.drone.is_sim_out():
             self.closed = False
             self.first_reset = False

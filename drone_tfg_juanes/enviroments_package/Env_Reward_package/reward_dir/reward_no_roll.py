@@ -59,7 +59,13 @@ class RewardNoRoll(RewardStrategyInterface):
         return angle_deg
 
     def _calculate_angle_reward(self, angle_deg):
-        reward = -self.max_reward
-        if angle_deg <= self.max_angle:
-            reward = self.max_reward * (1 - (angle_deg / self.max_angle))
+        if angle_deg <= self.max_angle / 2:
+            # De 0° a mitad del ángulo máximo, la recompensa disminuye de max_reward a 0
+            reward = self.max_reward * (1 - (2 * angle_deg / self.max_angle))
+        elif angle_deg <= self.max_angle:
+            # De mitad a ángulo máximo, la recompensa disminuye de 0 a -max_reward
+            reward = -self.max_reward * ((2 * angle_deg / self.max_angle) - 1)
+        else:
+            # Si el ángulo excede el máximo permitido, asigna la recompensa negativa máxima
+            reward = -self.max_reward
         return reward

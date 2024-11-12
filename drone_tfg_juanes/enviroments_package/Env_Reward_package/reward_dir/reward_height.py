@@ -6,9 +6,11 @@ class RewardHeight(RewardStrategyInterface):
     def class_name():
         return "height"
 
-    def __init__(self, ideal_height=0, max_reward=1):
+    def __init__(self, ideal_height=1, max_reward=1, tolerance_range=0.5, penalty_scale=0.1):
         self.ideal_height = ideal_height
         self.max_reward = max_reward
+        self.tolerance_range = tolerance_range
+        self.penalty_scale = penalty_scale
 
     def __str__(self):
         string = "name: Height" \
@@ -21,15 +23,14 @@ class RewardHeight(RewardStrategyInterface):
 
     def get_reward(self, obs: dict, motors:list, time) -> (int, bool, bool):
         altitude = obs["altimeter"][0]
-        reward = 0
-        terminated = False
-        if altitude > self.ideal_height:
-            reward = -self.ideal_height
-            terminated = True
+        height_diff = abs(self.ideal_height-altitude)
+
+        if height_diff <= self.tolerance_range:
+            reward = self.max_reward * (1 - (height_diff / self.tolerance_range))
         else:
-            reward = (altitude / self.ideal_height) * self.max_reward
-        print(reward)
-        return reward, terminated, False
+            reward = -self.penalty_scale * (height_diff - self.tolerance_range)
+
+        return reward, False, False
 
     def teardown(self):
         pass

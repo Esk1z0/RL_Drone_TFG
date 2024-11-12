@@ -1,12 +1,10 @@
 # Constantes xyz_controller
-TIME_OUT = 90
+TIME_OUT = 240
 TIME_STEP = 10
 SHM_SIZE = 2048
 
 SENSORS = ["camera",
            "inertial unit",
-           "left distance sensor",
-           "right distance sensor",
            "altimeter",
            "accelerometer",
            "GPS"]
