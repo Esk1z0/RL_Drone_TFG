@@ -1,5 +1,6 @@
 import subprocess
 import time
+import psutil
 
 from config import WIN_BASE_COMMAND, LINUX_BASE_COMMAND, FLAGS
 from threading import Event, Thread
@@ -66,7 +67,16 @@ class CommandExecutor:
         thread = Thread(target=run_command)
         thread.start()
 
-        while self.simulator_process is None or self.simulator_process.pid is None:
+        while self.simulator_process is None:
             time.sleep(0.1)
+        pid = self.simulator_process.pid
+        if not pid or pid == 1:  # Docker podría devolver PID 1 incorrectamente
+            for proc in psutil.process_iter(['pid', 'cmdline']):
+                if self.command in " ".join(proc.info['cmdline']):  # Verificar si el comando coincide
+                    pid = proc.info['pid']
+                    break
 
-        return self.simulator_process.pid
+        if pid is None:
+            raise RuntimeError("Could not find the correct PID for the simulator process.")
+
+        return pid

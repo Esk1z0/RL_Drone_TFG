@@ -1,13 +1,17 @@
+import os
 import time
 
 from enviroments_package.Drone_Env import DroneEnv
 import numpy as np
+import platform
 
 
 world_dir = "./simulation_package/worlds/my_frst_webots_world.wbt"
 env_config_dir = "./configs/reward_package_config/takeoff.json"
 
 if __name__ == "__main__":
+    print(platform.system())
+    print(os.listdir(os.getcwd()))
     ini = time.monotonic()
     env = DroneEnv(world_dir, env_config_dir)
     ini2 = time.monotonic()

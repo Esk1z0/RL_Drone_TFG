@@ -20,7 +20,7 @@ LINUX_BASE_COMMAND = "xvfb-run webots"
 FLAGS = {
     "batch": " --batch",
     "realtime": " --mode=realtime",
-    "fast": "--mode=fast",
+    "fast": " --mode=fast",
     "no_rendering": " --no-rendering",
     "minimize": " --minimize",
     "stdout": " --stdout",

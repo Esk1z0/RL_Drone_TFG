@@ -2,6 +2,8 @@ from queue import Queue
 from threading import Event, Thread
 import pickle
 
+import psutil
+
 from config import *
 from SharedMemoryCommunication import Comm
 from executor import CommandExecutor
@@ -20,8 +22,11 @@ class Drone:
         """
 
         process_pid = os.getpid()
+        print("drone_sim: ", psutil.Process(os.getpid()).children())#TODO:borrar
         self.request_memory = f"request_memory_{process_pid}"
         self.response_memory = f"response_memory_{process_pid}"
+        #self.request_memory = f"request_memory_"
+        #self.response_memory = f"response_memory_"
         self.webots_dir = webots_dir
         self.kwargs = kwargs
 
@@ -57,10 +62,23 @@ class Drone:
         self.queue_thread = Thread(target=self.queue_func)
 
         self.command_executor = CommandExecutor(self.sim_out, self.webots_dir, **self.kwargs)
-        pid = str(self.command_executor.execute())
+        pid = self.command_executor.execute()
+        #TODO:borrar
+        if pid == 1:
+            # Buscar procesos activos que coincidan con el comando lanzado
+            for proc in psutil.process_iter(['pid', 'cmdline']):
+                if self.command_executor.command.split()[0] in proc.info['cmdline']:
+                    pid = proc.info['pid']
+                    break
 
-        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=self.request_memory + pid,
-                            receiver_name=self.response_memory + pid,
+        if pid == 1:
+            raise RuntimeError("No se pudo obtener un PID válido para el simulador en Docker.")
+        #borrar
+        print("drone_simulation: ",self.request_memory, pid)#TODO: borrar
+        print("drone_simulation2: ", psutil.Process(os.getpid()).cmdline())#TODO:borrar
+
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=self.request_memory + str(pid),
+                            receiver_name=self.response_memory + str(pid),
                             close_event=self.sim_out)
         self.queue_thread.start()
 

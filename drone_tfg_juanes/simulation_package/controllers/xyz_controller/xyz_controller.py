@@ -20,6 +20,10 @@ class DroneServer:
         request_memory = f"request_memory_{pid}"
         response_memory = f"response_memory_{pid}"
 
+        print("controller: ", pid)#TODO:borrar
+        print("controller2: ", psutil.Process(os.getpid()).parent().parent().parent().pid)
+
+
         self.reception_running = False
         self.sending_running = False
 
