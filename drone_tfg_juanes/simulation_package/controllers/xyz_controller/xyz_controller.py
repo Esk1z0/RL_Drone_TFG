@@ -1,3 +1,4 @@
+import platform
 import threading
 import time
 import pickle
@@ -11,14 +12,25 @@ from drone_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, SHM_SI
 
 from drone_library.SharedMemoryCommunication import Comm
 
+from manager import  get_uid
+
 
 class DroneServer:
     def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
         controller_pid = psutil.Process(os.getpid()).parent().parent().parent().parent().pid
         launcher_pid = psutil.Process(os.getpid()).parent().parent().parent().pid
         pid = str(controller_pid)+str(launcher_pid)
-        request_memory = f"request_memory_{pid}"
-        response_memory = f"response_memory_{pid}"
+
+        #borrar
+        if platform.system() == "Windows":
+            self.uid = get_uid(launcher_pid)
+        else:
+            self.uid = get_uid(controller_pid)
+        print("uid",self.uid)
+        #TODO:borrar
+
+        request_memory = f"request_memory_{self.uid}"
+        response_memory = f"response_memory_{self.uid}"
 
         print("controller: ", pid)#TODO:borrar
         print("controller2: ", psutil.Process(os.getpid()).parent().parent().parent().pid)

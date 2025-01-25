@@ -10,7 +10,9 @@ from executor import CommandExecutor
 
 import os
 
+import uuid
 
+from manager import register_uid
 class Drone:
     """
         It works as an interface with the simulation in 4 simple functions. It starts the simulation, sends the motor
@@ -23,10 +25,13 @@ class Drone:
 
         process_pid = os.getpid()
         print("drone_sim: ", psutil.Process(os.getpid()).children())#TODO:borrar
-        self.request_memory = f"request_memory_{process_pid}"
-        self.response_memory = f"response_memory_{process_pid}"
-        #self.request_memory = f"request_memory_"
-        #self.response_memory = f"response_memory_"
+        #self.request_memory = f"request_memory_{process_pid}"
+        #self.response_memory = f"response_memory_{process_pid}"
+
+        self.uid = 0 #TODO: borrar
+
+        self.request_memory = f"request_memory_"
+        self.response_memory = f"response_memory_"
         self.webots_dir = webots_dir
         self.kwargs = kwargs
 
@@ -63,22 +68,17 @@ class Drone:
 
         self.command_executor = CommandExecutor(self.sim_out, self.webots_dir, **self.kwargs)
         pid = self.command_executor.execute()
-        #TODO:borrar
-        if pid == 1:
-            # Buscar procesos activos que coincidan con el comando lanzado
-            for proc in psutil.process_iter(['pid', 'cmdline']):
-                if self.command_executor.command.split()[0] in proc.info['cmdline']:
-                    pid = proc.info['pid']
-                    break
 
-        if pid == 1:
-            raise RuntimeError("No se pudo obtener un PID válido para el simulador en Docker.")
-        #borrar
         print("drone_simulation: ",self.request_memory, pid)#TODO: borrar
         print("drone_simulation2: ", psutil.Process(os.getpid()).cmdline())#TODO:borrar
 
-        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=self.request_memory + str(pid),
-                            receiver_name=self.response_memory + str(pid),
+        #TODO:borrar
+        self.uid = str(uuid.uuid4())
+        register_uid(pid, self.uid)
+        #borrar
+
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=self.request_memory + self.uid,#str(pid),
+                            receiver_name=self.response_memory + self.uid,#str(pid),
                             close_event=self.sim_out)
         self.queue_thread.start()
 
