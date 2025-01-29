@@ -12,7 +12,7 @@ import os
 
 import uuid
 
-from manager import register_uid
+from manager import register_uid, _read_manager, delete_uid
 class Drone:
     """
         It works as an interface with the simulation in 4 simple functions. It starts the simulation, sends the motor
@@ -75,12 +75,15 @@ class Drone:
         #TODO:borrar
         self.uid = str(uuid.uuid4())
         register_uid(pid, self.uid)
+        print("drone_simulation uid: ", self.uid)
+        print("drone_simulation manager: ", _read_manager())
         #borrar
 
         self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=self.request_memory + self.uid,#str(pid),
                             receiver_name=self.response_memory + self.uid,#str(pid),
                             close_event=self.sim_out)
         self.queue_thread.start()
+        print("channel ok and thread started")
 
     def is_sim_out(self):
         return self.sim_out.is_set()
@@ -89,5 +92,6 @@ class Drone:
         """
             Sends the signal to the simulation to end Webots simulation and the communication channel
         """
+        delete_uid(self.uid)
         self.channel.send(pickle.dumps({"ACTION": "CLOSE_CONNECTION", "PARAMS": ""}))
         self.channel.close_connection()

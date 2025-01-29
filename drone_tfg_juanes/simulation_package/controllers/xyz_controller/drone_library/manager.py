@@ -42,7 +42,7 @@ def register_uid(pid, uid):
 
 def get_uid(pid):
     """
-    Obtiene el UID asociado a un PID y elimina la entrada del archivo manager.
+    Obtiene el UID asociado a un PID sin eliminar la entrada del archivo manager.
 
     Args:
         pid (int): PID del controlador.
@@ -51,9 +51,28 @@ def get_uid(pid):
         str: UID asociado al PID, o None si no se encuentra.
     """
     data = _read_manager()
-    uid = data.pop(str(pid), None)  # Eliminar y devolver el UID
-    _write_manager(data)
-    return uid
+    return data.get(str(pid))
+
+
+def delete_uid(uid):
+    """
+    Elimina la entrada asociada a un UID del archivo manager.
+
+    Args:
+        uid (str): UID asociado a algún PID.
+    """
+    data = _read_manager()
+    pid_to_delete = None
+
+    # Buscar el PID asociado al UID
+    for pid, stored_uid in data.items():
+        if stored_uid == uid:
+            pid_to_delete = pid
+            break
+
+    if pid_to_delete:
+        del data[pid_to_delete]
+        _write_manager(data)
 
 
 def list_all_uids():

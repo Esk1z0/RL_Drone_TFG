@@ -1,5 +1,5 @@
 # Constantes xyz_controller
-TIME_OUT = 240
+TIME_OUT = 60#240
 TIME_STEP = 10
 SHM_SIZE = 2048
 
@@ -16,7 +16,7 @@ ACTUATORS = ["front left propeller",
 
 # Command constants
 WIN_BASE_COMMAND = "webots"
-LINUX_BASE_COMMAND = "xvfb-run webots"
+LINUX_BASE_COMMAND = "xvfb-run -a -s \"-screen 0 1024x768x24\" webots" #"xvfb-run webots"
 FLAGS = {
     "batch": " --batch",
     "realtime": " --mode=realtime",

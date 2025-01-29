@@ -142,6 +142,7 @@ class DroneServer:
 
 
 if __name__ == '__main__':
+    print("instance up")#TODO: borrar
     server = DroneServer()
     try:
         print("Simulation Starting")
