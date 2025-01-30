@@ -1,0 +1,166 @@
+def two_instances_subproc(steps=20):
+    """
+    Crea dos instancias de tu entorno usando SubprocVecEnv y ejecuta 'steps' pasos manualmente,
+    imprimiendo las recompensas y tiempos de ejecución.
+
+    Args:
+        world_dir (str): Ruta al archivo .wbt o mundo de Webots.
+        env_config_dir (str): Configuración de recompensa u otras definiciones para el entorno.
+        steps (int): Número de pasos a ejecutar en cada entorno.
+    """
+
+    # Función para crear una instancia del entorno
+    def make_env():
+        import gymnasium
+        from enviroments_package import DroneEnv  # o tu clase DroneEnv real
+
+        def _init():
+            # Ajusta la creación del entorno con los argumentos que requiera DroneEnv
+            env = DroneEnv(world_dir, env_config_dir)
+            return env
+        return _init
+
+    # Impresión de información del sistema
+    print(platform.system())
+    print("Archivos en el directorio actual:", os.listdir(os.getcwd()))
+
+    ini = time.monotonic()
+
+    # Crear el SubprocVecEnv con 2 entornos en paralelo
+    env = SubprocVecEnv([make_env(), make_env()])
+    ini2 = time.monotonic()
+
+    # Resetear los entornos en paralelo
+    obs = env.reset()
+
+    action = np.array([
+        [50, 50, 50, 50],  # Acción para el primer entorno
+        [50, 50, 50, 50]   # Acción para el segundo entorno
+    ])
+
+    for i in range(steps):
+        # Realizar un paso en ambos entornos con la misma acción
+        # (o podrías generar acciones distintas para cada entorno)
+        observation, reward, terminated, truncated = env.step(action)
+
+        # Imprimir recompensas de cada entorno
+        print(f"Paso {i+1}:")
+        for env_idx in range(2):
+            print(f"  - Entorno {env_idx+1}: recompensa={reward[env_idx]}, done={terminated[env_idx]}, truncated={truncated[env_idx]}")
+
+        # Si alguno de los entornos ha terminado o ha sido truncado, se reinicia sólo ese entorno
+        if any(terminated) or any(truncated):
+            obs = env.reset()
+
+    fin_train = time.monotonic()
+
+    # Cerrar el vec_env
+    env.close()
+
+    # Esperar un poco antes de medir el tiempo total
+    time.sleep(1)
+    fin = time.monotonic()
+
+    print(f"tiempo train {fin_train - ini}")
+    print(f"tiempo train sin crear entornos {fin_train - ini2}")
+    print(f"tiempo total {fin - ini}")
+
+
+def three_instances():
+    print(platform.system())
+    print(os.listdir(os.getcwd()))
+    ini = time.monotonic()
+
+    # Crear tres instancias del entorno
+    env = DroneEnv(world_dir, env_config_dir)
+    env2 = DroneEnv(world_dir, env_config_dir)
+    env3 = DroneEnv(world_dir, env_config_dir)
+    ini2 = time.monotonic()
+
+    # Resetear las tres instancias
+    env.reset()
+    env2.reset()
+    env3.reset()
+
+    action = np.array([50, 50, 50, 50])
+    for i in range(20):
+        # Realizar pasos en las tres instancias
+        observation1, reward1, terminated1, truncated1, info1 = env.step(action)
+        observation2, reward2, terminated2, truncated2, info2 = env2.step(action)
+        observation3, reward3, terminated3, truncated3, info3 = env3.step(action)
+
+        # Imprimir recompensas y observaciones
+        print("env1:", reward1)
+        print("env2:", reward2)
+        print("env3:", reward3)
+        print("obs1", observation1)
+
+        # Verificar si alguna instancia ha terminado o necesita reiniciarse
+        if terminated1 or truncated1:
+            observation1, info1 = env.reset()
+        if terminated2 or truncated2:
+            observation2, info2 = env2.reset()
+        if terminated3 or truncated3:
+            observation3, info3 = env3.reset()
+
+    fin_train = time.monotonic()
+
+    # Cerrar las tres instancias
+    env.close()
+    env2.close()
+    env3.close()
+
+    time.sleep(3)
+    fin = time.monotonic()
+
+    print(f"tiempo train {fin_train - ini}")
+    print(f"tiempo train sin crear webots {fin_train - ini2}")
+    print(f"tiempo total {fin - ini}")
+
+
+def two_instances():
+    print(platform.system())
+    print(os.listdir(os.getcwd()))
+    ini = time.monotonic()
+    env = DroneEnv(world_dir, env_config_dir)
+    env2 = DroneEnv(world_dir, env_config_dir)
+    ini2 = time.monotonic()
+
+    env.reset()
+    env2.reset()
+
+    action = np.array([50, 50, 50, 50])
+    for i in range(20):
+        observation1, reward1, terminated1, truncated1, info = env.step(action)
+        observation, reward2, terminated2, truncated2, info = env2.step(action)
+        print("env1:", reward1)
+        print("env2:", reward2)
+        print("obs1", observation1)
+        if terminated1 or truncated1 or terminated2 or truncated2:
+            observation, info = env.reset()
+            observation, info = env2.reset()
+    fin_train = time.monotonic()
+    env.close()
+    env2.close()
+    time.sleep(3)
+    fin = time.monotonic()
+    print(f"tiempo train {fin_train - ini}\ntiempo train sin crear webots {fin_train - ini2}\ntiempo total {fin - ini}")
+
+def one_instance():
+    print(platform.system())
+    print(os.listdir(os.getcwd()))
+    ini = time.monotonic()
+    env = DroneEnv(world_dir, env_config_dir)
+    ini2 = time.monotonic()
+    env.reset()
+    action = np.array([500, 500, 500, 500])
+    for i in range(20):
+        observation, reward, terminated, truncated, info = env.step(action)
+        print(reward)
+        if terminated or truncated:
+            observation, info = env.reset()
+    fin_train = time.monotonic()
+    env.close()
+    time.sleep(3)
+    fin = time.monotonic()
+    print(f"tiempo train {fin_train-ini}\ntiempo train sin crear webots {fin_train-ini2}\ntiempo total {fin-ini}")

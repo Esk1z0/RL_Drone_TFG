@@ -1,90 +1,97 @@
 import os
 import json
 import tempfile
-from threading import Lock
+import portalocker
 
-# Archivo "manager" donde se registrarán los UIDs
 MANAGER_FILE = os.path.join(tempfile.gettempdir(), "uid_manager.json")
-lock = Lock()
 
-# Asegurarse de que el archivo manager exista
 if not os.path.exists(MANAGER_FILE):
     with open(MANAGER_FILE, "w") as f:
         json.dump({}, f)
 
-
 def _read_manager():
-    """Lee el archivo manager y devuelve los datos como un diccionario."""
-    with lock:
-        with open(MANAGER_FILE, "r") as f:
-            return json.load(f)
-
-
-def _write_manager(data):
-    """Escribe los datos en el archivo manager."""
-    with lock:
-        with open(MANAGER_FILE, "w") as f:
-            json.dump(data, f)
-
+    """
+    Lee el archivo manager y devuelve los datos como un diccionario,
+    usando un lock de archivo para evitar colisiones entre procesos.
+    """
+    with open(MANAGER_FILE, "r") as f:
+        # Adquiere lock de lectura/escritura
+        portalocker.lock(f, portalocker.LOCK_EX)
+        data = json.load(f)
+        # Libera el lock antes de retornar
+        portalocker.unlock(f)
+    return data
 
 def register_uid(pid, uid):
     """
-    Registra un UID asociado a un PID en el archivo manager.
-
-    Args:
-        pid (int): PID del controlador.
-        uid (str): UID asociado al PID.
+    Registra un UID asociado a un PID en el archivo manager,
+    en un solo paso de lock, read, modify, write.
     """
-    data = _read_manager()
-    data[str(pid)] = uid
-    _write_manager(data)
+    with open(MANAGER_FILE, "r+") as f:
+        portalocker.lock(f, portalocker.LOCK_EX)  # Bloqueo completo
+        data = json.load(f)
 
+        # Actualizar data en memoria
+        data[str(pid)] = uid
+
+        # Re-escribir el archivo completo
+        f.seek(0)
+        json.dump(data, f)
+        f.truncate()
+
+        portalocker.unlock(f)
 
 def get_uid(pid):
     """
-    Obtiene el UID asociado a un PID sin eliminar la entrada del archivo manager.
-
-    Args:
-        pid (int): PID del controlador.
-
-    Returns:
-        str: UID asociado al PID, o None si no se encuentra.
+    Obtiene el UID asociado a un PID, sin eliminar la entrada.
     """
-    data = _read_manager()
-    return data.get(str(pid))
-
+    with open(MANAGER_FILE, "r+") as f:
+        portalocker.lock(f, portalocker.LOCK_EX)
+        data = json.load(f)
+        uid = data.get(str(pid))
+        portalocker.unlock(f)
+    return uid
 
 def delete_uid(uid):
     """
-    Elimina la entrada asociada a un UID del archivo manager.
-
-    Args:
-        uid (str): UID asociado a algún PID.
+    Elimina la entrada asociada a un UID.
     """
-    data = _read_manager()
-    pid_to_delete = None
+    with open(MANAGER_FILE, "r+") as f:
+        portalocker.lock(f, portalocker.LOCK_EX)
+        data = json.load(f)
 
-    # Buscar el PID asociado al UID
-    for pid, stored_uid in data.items():
-        if stored_uid == uid:
-            pid_to_delete = pid
-            break
+        pid_to_delete = None
+        for pid, stored_uid in data.items():
+            if stored_uid == uid:
+                pid_to_delete = pid
+                break
 
-    if pid_to_delete:
-        del data[pid_to_delete]
-        _write_manager(data)
+        if pid_to_delete:
+            del data[pid_to_delete]
 
+        f.seek(0)
+        json.dump(data, f)
+        f.truncate()
+
+        portalocker.unlock(f)
 
 def list_all_uids():
     """
-    Lista todas las entradas del archivo manager.
-
-    Returns:
-        dict: Diccionario con todos los PIDs y sus UIDs.
+    Lista todas las entradas del manager.
     """
-    return _read_manager()
-
+    with open(MANAGER_FILE, "r") as f:
+        portalocker.lock(f, portalocker.LOCK_EX)
+        data = json.load(f)
+        portalocker.unlock(f)
+    return data
 
 def clear_manager():
-    """Limpia todas las entradas del archivo manager."""
-    _write_manager({})
+    """
+    Limpia todas las entradas.
+    """
+    with open(MANAGER_FILE, "r+") as f:
+        portalocker.lock(f, portalocker.LOCK_EX)
+        json.dump({}, f)
+        f.truncate()
+        portalocker.unlock(f)
+

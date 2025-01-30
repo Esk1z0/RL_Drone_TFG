@@ -23,12 +23,7 @@ class Drone:
             Initialize the drone interface, the channel and the simulation
         """
 
-        process_pid = os.getpid()
-        print("drone_sim: ", psutil.Process(os.getpid()).children())#TODO:borrar
-        #self.request_memory = f"request_memory_{process_pid}"
-        #self.response_memory = f"response_memory_{process_pid}"
-
-        self.uid = 0 #TODO: borrar
+        self.uid = 0
 
         self.request_memory = f"request_memory_"
         self.response_memory = f"response_memory_"
@@ -69,21 +64,14 @@ class Drone:
         self.command_executor = CommandExecutor(self.sim_out, self.webots_dir, **self.kwargs)
         pid = self.command_executor.execute()
 
-        print("drone_simulation: ",self.request_memory, pid)#TODO: borrar
-        print("drone_simulation2: ", psutil.Process(os.getpid()).cmdline())#TODO:borrar
-
-        #TODO:borrar
         self.uid = str(uuid.uuid4())
         register_uid(pid, self.uid)
-        print("drone_simulation uid: ", self.uid)
-        print("drone_simulation manager: ", _read_manager())
-        #borrar
 
-        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=self.request_memory + self.uid,#str(pid),
-                            receiver_name=self.response_memory + self.uid,#str(pid),
+        self.channel = Comm(buffer_size=SHM_SIZE, emitter_name=self.request_memory + self.uid,
+                            receiver_name=self.response_memory + self.uid,
                             close_event=self.sim_out)
         self.queue_thread.start()
-        print("channel ok and thread started")
+
 
     def is_sim_out(self):
         return self.sim_out.is_set()

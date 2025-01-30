@@ -1,5 +1,5 @@
 # Constantes xyz_controller
-TIME_OUT = 60#240
+TIME_OUT = 300
 TIME_STEP = 10
 SHM_SIZE = 2048
 

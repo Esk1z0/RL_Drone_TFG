@@ -12,28 +12,30 @@ from drone_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, SHM_SI
 
 from drone_library.SharedMemoryCommunication import Comm
 
-from manager import  get_uid
+from manager import get_uid, _read_manager
 
 
 class DroneServer:
+    def call_uid(self, pid):
+        for _ in range(5):
+            uid = get_uid(pid)
+            if uid is not None:
+                return uid
+            time.sleep(0.1)
+        return None  # si luego de 5 intentos no aparece
+
     def __init__(self, time_out=TIME_OUT, time_step=TIME_STEP):
         controller_pid = psutil.Process(os.getpid()).parent().parent().parent().parent().pid
         launcher_pid = psutil.Process(os.getpid()).parent().parent().parent().pid
         pid = str(controller_pid)+str(launcher_pid)
 
-        #borrar
         if platform.system() == "Windows":
-            self.uid = get_uid(launcher_pid)
+            self.uid = self.call_uid(launcher_pid)
         else:
-            self.uid = get_uid(controller_pid)
-        print("uid",self.uid)
-        #TODO:borrar
+            self.uid = self.call_uid(controller_pid)
 
         request_memory = f"request_memory_{self.uid}"
         response_memory = f"response_memory_{self.uid}"
-
-        print("controller: ", pid)#TODO:borrar
-        print("controller2: ", psutil.Process(os.getpid()).parent().parent().parent().pid)
 
 
         self.reception_running = False
@@ -142,7 +144,6 @@ class DroneServer:
 
 
 if __name__ == '__main__':
-    print("instance up")#TODO: borrar
     server = DroneServer()
     try:
         print("Simulation Starting")
