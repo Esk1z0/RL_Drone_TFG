@@ -5,6 +5,7 @@ from datetime import datetime
 
 import gymnasium
 import pandas as pd
+import argparse
 
 # Stable_Baselines3 y extensiones
 from sb3_contrib import RecurrentPPO
@@ -20,14 +21,13 @@ from enviroments_package import RemoveKeyObservationWrapper, ScaleRewardWrapper,
 # -------------------------------------------------------------------
 # Datos y configuraciones generales
 world_dir = "./simulation_package/worlds/my_frst_webots_world.wbt"
-#env_config_dir = "./configs/reward_package_config/takeoff.json"
 json_reward = "./configs/reward_package_config/motors_use.json"
 
 model_dir = "./models/ppomodel"
 log_dir = "./logs/"
 data_collected_dir = "./data_collected/"
 
-timesteps = 2048#0
+timesteps = 1024#20480
 n_steps = 1024
 batch_size = 64
 lr = 1e-3
@@ -130,11 +130,40 @@ def update_model(model, env, log_dir='./logs/', n_eval_episodes=10):
         env.close()
         return False
 
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Script de entrenamiento con Stable Baselines3 y Webots.")
+
+    # Opción para recibir la carpeta de guardado
+    parser.add_argument(
+        "--save-dir",
+        type=str,
+        default="./data",
+        help="Directorio donde se guardarán los modelos, logs y otros archivos."
+    )
+
+    # Puedes añadir más argumentos si lo deseas...
+    return parser.parse_args()
+
+
 # -------------------------------------------------------------------
 # Lógica principal
 if __name__ == "__main__":
+    # Primero parseamos los argumentos:
+    args = parse_args()
+
+    # Ajusta log_dir, data_collected_dir, model_dir con la ruta que pase el usuario
+    base_save_dir = args.save_dir
+
+    log_dir = os.path.join(base_save_dir, "logs")
+    data_collected_dir = os.path.join(base_save_dir, "data_collected")
+    model_dir = os.path.join(base_save_dir, "models", "ppomodel")
+
+    # Asegura que las carpetas existen
     os.makedirs(log_dir, exist_ok=True)
     os.makedirs(data_collected_dir, exist_ok=True)
+    os.makedirs(os.path.dirname(model_dir), exist_ok=True)
+
 
     # Crear el entorno vectorizado SubprocVecEnv con 'num_envs' copias
     env = SubprocVecEnv([make_env() for _ in range(num_envs)])
