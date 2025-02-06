@@ -33,4 +33,4 @@ EXPOSE 8000
 EXPOSE 8001
 
 # Comando por defecto
-CMD ["python", "run_simulation.py"]
+CMD ["python", "run_simulation.py", "--save-dir", "/home/drone_tfg_juanes/data"]

@@ -27,12 +27,12 @@ model_dir = "./models/ppomodel"
 log_dir = "./logs/"
 data_collected_dir = "./data_collected/"
 
-timesteps = 1024#20480
-n_steps = 1024
+timesteps = 64#20480
+n_steps = 64
 batch_size = 64
 lr = 1e-3
 ent_coef = 0.06
-num_envs = 4
+num_envs = 1
 
 # -------------------------------------------------------------------
 # Funciones
@@ -205,3 +205,4 @@ if __name__ == "__main__":
         single_env = make_env()()
         if update_model(model, single_env, n_eval_episodes=10):
             model.save(path=model_dir)
+    print("END TRAINNING")
