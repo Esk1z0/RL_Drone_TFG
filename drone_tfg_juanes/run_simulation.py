@@ -27,7 +27,7 @@ model_dir = "./models/ppomodel"
 log_dir = "./logs/"
 data_collected_dir = "./data_collected/"
 
-timesteps = 64#20480
+timesteps = 256#20480
 n_steps = 64
 batch_size = 64
 lr = 1e-3
@@ -45,7 +45,7 @@ def make_env():
             'drone_tfg_juanes/Drone-v1',
             simulation_path=world_dir,
             reward_json_path=json_reward,
-            no_render=False
+            no_render=True
         )
         # Aplica los wrappers necesarios
         env = RemoveKeyObservationWrapper(env, remove_keys=["camera", "gps"])

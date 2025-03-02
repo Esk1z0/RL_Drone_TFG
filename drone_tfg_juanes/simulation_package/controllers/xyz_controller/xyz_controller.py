@@ -103,7 +103,7 @@ class DroneServer:
             action = self.channel.receive()
             tag = action["ACTION"]
             params = action["PARAMS"]
-            print(tag, params)
+            #print(tag, params)
             self.actions(tag, params)
         except:
             pass

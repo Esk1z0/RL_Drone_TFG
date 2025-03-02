@@ -29,8 +29,8 @@ RUN pip install -e .
 RUN pip install -e ./simulation_package/controllers/xyz_controller/drone_library
 
 # Exponer los puertos (si es necesario)
-EXPOSE 8000
-EXPOSE 8001
+#EXPOSE 8000
+#EXPOSE 8001
 
 # Comando por defecto
 CMD ["python", "run_simulation.py", "--save-dir", "/home/drone_tfg_juanes/data"]
