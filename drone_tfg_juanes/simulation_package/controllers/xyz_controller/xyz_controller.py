@@ -86,7 +86,7 @@ class DroneServer:
     def send_obs(self):
         try:
             self.channel.send(pickle.dumps({
-                "camera": np.frombuffer(self.devices["camera"].getImage(), dtype=np.uint8),
+                #"camera": np.frombuffer(self.devices["camera"].getImage(), dtype=np.uint8),
                 "inertial unit": np.array(self.devices["inertial unit"].getQuaternion(), dtype=np.float32),
                 "altimeter": np.array([self.devices["altimeter"].getValue()], dtype=np.float32),
                 "accelerometer": np.array(self.devices["accelerometer"].getValues(), dtype=np.float32),

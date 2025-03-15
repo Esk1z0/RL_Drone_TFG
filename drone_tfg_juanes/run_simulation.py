@@ -56,7 +56,7 @@ def make_env():
             no_render=True
         )
         # Aplica los wrappers necesarios
-        env = RemoveKeyObservationWrapper(env, remove_keys=["camera", "gps"])
+        env = RemoveKeyObservationWrapper(env, remove_keys=["gps"])#["camera", "gps"])
         env = ScaleRewardWrapper(env, scale_factor=0.1)
         env = ScaleActionWrapper(env, in_low=-1, in_high=1, out_low=0, out_high=576)
         # Si quisieras acciones binarias:

@@ -17,7 +17,7 @@ class DroneEnv(Env):
         """
         #super().__init__()
         self.observation_space = spaces.Dict({
-            "camera": spaces.Box(low=0, high=255, shape=(384000,), dtype=np.uint8), #(240, 400 4)
+            #"camera": spaces.Box(low=0, high=255, shape=(384000,), dtype=np.uint8), #(240, 400 4)
             "inertial unit": spaces.Box(low=-1, high=1, shape=(4,), dtype=np.float32),
             "altimeter": spaces.Box(low=0, high=np.inf, dtype=np.float32),
             "accelerometer": spaces.Box(low=-np.inf, high=np.inf, shape=(3,), dtype=np.float32),
@@ -103,7 +103,7 @@ class DroneEnv(Env):
                 reward (float): The reward given to the agent form its actions
                 terminated (bool): The tests can terminate the episode if the drone fail the task
         """
-        reward, terminated, change_reward_function = self.reward_function.get_reward(observation,self.motors)
+        reward, terminated, change_reward_function = self.reward_function.get_reward(observation, self.motors)
         if change_reward_function and not terminated:
             self.reward_function = self.reward_function_loader.get_next_reward_function()
             self.reward_function.start_reward(observation, self.motors)
