@@ -134,7 +134,9 @@ if __name__ == "__main__":
     restart_callback = CustomCheckpointCallback(
         log_dir=log_dir,
         data_collected_dir=data_collected_dir,
-        model_dir=model_dir
+        model_dir=model_dir,
+        n_steps=n_steps,
+        last_checkpoint=trained_so_far
     )
     callbacks = CallbackList([trainning_callback, restart_callback])
 
