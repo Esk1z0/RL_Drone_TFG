@@ -12,7 +12,7 @@ from drone_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, SHM_SI
 
 from drone_library.SharedMemoryCommunication import Comm
 
-from manager import get_uid, _read_manager
+from manager import get_uid
 
 
 class DroneServer:
@@ -85,14 +85,20 @@ class DroneServer:
 
     def send_obs(self):
         try:
-            self.channel.send(pickle.dumps({
-                #"camera": np.frombuffer(self.devices["camera"].getImage(), dtype=np.uint8),
-                "inertial unit": np.array(self.devices["inertial unit"].getQuaternion(), dtype=np.float32),
-                "altimeter": np.array([self.devices["altimeter"].getValue()], dtype=np.float32),
-                "accelerometer": np.array(self.devices["accelerometer"].getValues(), dtype=np.float32),
-                "gps": np.array(self.devices["GPS"].getValues(), dtype=np.float32)
-            }))
-
+            observations = {}
+            dev = self.devices  # Cacheamos la referencia para evitar acceder a self.devices en cada iteración.
+            for sensor in SENSORS:
+                device = dev[sensor]
+                if sensor == "inertial unit":
+                    # Se obtiene un cuaternión: [qx, qy, qz, qw].
+                    observations[sensor] = np.array(device.getQuaternion(), dtype=np.float32)
+                elif sensor == "gps":
+                    # Estos sensores retornan un vector de valores.
+                    observations[sensor] = np.array(device.getValues(), dtype=np.float32)
+                else:
+                    # Para el resto se asume un único valor.
+                    observations[sensor] = np.array([device.getValue()], dtype=np.float32)
+            self.channel.send(pickle.dumps(observations))
         except:
             pass
         finally:
@@ -112,15 +118,8 @@ class DroneServer:
 
     def actions(self, tag, params:np.float32):
         if tag == "SET_ALL_MOTORS":
-            motor_rl = self.devices['rear left propeller']
-            motor_rr = self.devices['rear right propeller']
-            motor_fl = self.devices['front left propeller']
-            motor_fr = self.devices['front right propeller']
-
-            motor_rl.setVelocity(-params[0])
-            motor_rr.setVelocity(params[1])
-            motor_fl.setVelocity(params[2])
-            motor_fr.setVelocity(-params[3])
+            for idx, motor in enumerate(ACTUATORS):
+                self.devices[motor].setPosition(params[idx])
         elif tag == "RESET":
             self.robot.simulationReset()
             self.enable_everything()
@@ -135,8 +134,8 @@ class DroneServer:
             self.devices.update({i: device})
         for j in ACTUATORS:
             device = self.robot.getDevice(j)
-            device.setPosition(float('inf'))
-            device.setVelocity(1)
+            device.setPosition(0)
+            device.setVelocity(1.70068)
             self.devices.update({j: device})
 
     def end_simulation(self):

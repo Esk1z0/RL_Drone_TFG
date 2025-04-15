@@ -1,11 +1,11 @@
 import unittest
 import time
-from drone_tfg_juanes.enviroments_package.Env_Reward_package.reward_builder import RewardLoader
+from drone_tfg_juanes.environments_package.Env_Reward_package.reward_builder import RewardLoader
 
-json_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/enviroments_package/Env_Reward_package/reward_package_config/test_takeoff.json"
-json_timer_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/enviroments_package/Env_Reward_package/reward_package_config/test_basic_reward.json"
-json_zone_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/enviroments_package/Env_Reward_package/reward_package_config/test_zone.json"
-json_height = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/enviroments_package/Env_Reward_package/reward_package_config/test_height.json"
+json_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/environments_package/Env_Reward_package/reward_package_config/test_takeoff.json"
+json_timer_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/environments_package/Env_Reward_package/reward_package_config/test_basic_reward.json"
+json_zone_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/environments_package/Env_Reward_package/reward_package_config/test_zone.json"
+json_height = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/environments_package/Env_Reward_package/reward_package_config/test_height.json"
 
 class MyTestCase(unittest.TestCase):
     def test_something(self):

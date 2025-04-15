@@ -1,6 +1,0 @@
-setup.py
-enviroments_package.egg-info/PKG-INFO
-enviroments_package.egg-info/SOURCES.txt
-enviroments_package.egg-info/dependency_links.txt
-enviroments_package.egg-info/requires.txt
-enviroments_package.egg-info/top_level.txt

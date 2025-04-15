@@ -18,25 +18,25 @@ from stable_baselines3.common.logger import configure
 from stable_baselines3.common.evaluation import evaluate_policy
 
 # Wrappers propios
-from enviroments_package import RemoveKeyObservationWrapper, ScaleRewardWrapper, ScaleActionWrapper, BinaryActionWrapper
+from environments_package import RemoveKeyObservationWrapper, ScaleRewardWrapper, ScaleActionWrapper
 # Callbacks propios
-from enviroments_package import CustomCheckpointCallback, TrainingCallback
+from environments_package import CustomCheckpointCallback, TrainingCallback
 
 
 
 
 # Datos y configuraciones generales ////////////////////////////////////////////////////////////////////////////////////
 
-world_dir = "./simulation_package/worlds/my_frst_webots_world.wbt"
-json_reward = "./configs/reward_package_config/motors_use.json"
+world_dir = "./simulation_package/worlds/bioloid_env.wbt"
+json_reward = "./configs/reward_package_config/test_bioloid.json"
 
 model_dir = "./models/ppomodel"
 log_dir = "./logs/"
 data_collected_dir = "./data_collected/"
 
-timesteps = 307200
-n_steps = 1024
-batch_size = 256
+timesteps = 1024#307200
+n_steps = 64#1024
+batch_size = 16#256
 lr = 1e-3
 ent_coef = 0.01
 num_envs = 1
@@ -52,17 +52,15 @@ def make_env():
 
     def _init():
         env = gymnasium.make(
-            'drone_tfg_juanes/Drone-v1',
+            'tfg_juanes/CustomBioloid-v1',
             simulation_path=world_dir,
             reward_json_path=json_reward,
-            no_render=True
+            no_render=False
         )
         # Aplica los wrappers necesarios
         env = RemoveKeyObservationWrapper(env, remove_keys=["gps"])#["camera", "gps"])
-        env = ScaleRewardWrapper(env, scale_factor=0.1)
-        env = ScaleActionWrapper(env, in_low=-1, in_high=1, out_low=0, out_high=576)
-        # Si quisieras acciones binarias:
-        # env = BinaryActionWrapper(env, power_level=500)
+        env = ScaleRewardWrapper(env, scale_factor=1.5)
+        env = ScaleActionWrapper(env)
         return env
 
     return _init

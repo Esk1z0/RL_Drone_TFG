@@ -3,10 +3,10 @@ import time
 
 import numpy as np
 
-from drone_tfg_juanes.enviroments_package.Drone_Env import DroneEnv
-from drone_tfg_juanes.enviroments_package.Wrappers.RemoveKeyObservationWrapper import RemoveKeyObservationWrapper
-from drone_tfg_juanes.enviroments_package.Wrappers.ScaleActionWrapper import ScaleActionWrapper
-from drone_tfg_juanes.enviroments_package.Wrappers.ScaleRewardWrapper import ScaleRewardWrapper
+from drone_tfg_juanes.environments_package.Drone_Env import DroneEnv
+from drone_tfg_juanes.environments_package.Wrappers.RemoveKeyObservationWrapper import RemoveKeyObservationWrapper
+from drone_tfg_juanes.environments_package.Wrappers.ScaleActionWrapper import ScaleActionWrapper
+from drone_tfg_juanes.environments_package.Wrappers.ScaleRewardWrapper import ScaleRewardWrapper
 
 world_dir = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/simulation_package/worlds/my_frst_webots_world.wbt"
 json_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/configs/reward_package_config/test_takeoff.json"

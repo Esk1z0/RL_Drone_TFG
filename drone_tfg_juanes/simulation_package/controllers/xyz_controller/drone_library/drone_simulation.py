@@ -13,12 +13,14 @@ import os
 import uuid
 
 from manager import register_uid, _read_manager, delete_uid
-class Drone:
+
+
+class Bioloid:
     """
         It works as an interface with the simulation in 4 simple functions. It starts the simulation, sends the motor
         actions, receive the data_collected from the sensors and shutdown the simulation
     """
-    def __init__(self, webots_dir, **kwargs):
+    def __init__(self, simulation_path, **kwargs):
         """
             Initialize the drone interface, the channel and the simulation
         """
@@ -27,7 +29,7 @@ class Drone:
 
         self.request_memory = f"request_memory_"
         self.response_memory = f"response_memory_"
-        self.webots_dir = webots_dir
+        self.webots_dir = simulation_path
         self.kwargs = kwargs
 
         self.sim_out = None
