@@ -249,7 +249,7 @@ class MyTestCase(unittest.TestCase):
 
 
     def test_timeout_rerun(self):
-        from drone_tfg_juanes.simulation_package.controllers.xyz_controller.drone_library.config import TIME_OUT
+        from drone_tfg_juanes.simulation_package.controllers.xyz_controller.robot_library.config import TIME_OUT
         json_basic = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/configs/reward_package_config/basic_no_roll.json"
         env = DroneEnv(world_dir, json_basic, no_render=False)
         env.reset()

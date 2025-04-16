@@ -1,66 +1,45 @@
 import os
-import shutil
-import time
-from datetime import datetime
 import json
-
-import gymnasium
-import pandas as pd
 import argparse
 
-# Stable_Baselines3 y extensiones
+import gymnasium
+import torch
 from sb3_contrib import RecurrentPPO
 from stable_baselines3.common.env_util import SubprocVecEnv
 from stable_baselines3.common.vec_env import VecMonitor
-
 from stable_baselines3.common.callbacks import CallbackList
 from stable_baselines3.common.logger import configure
-from stable_baselines3.common.evaluation import evaluate_policy
 
-# Wrappers propios
-from environments_package import RemoveKeyObservationWrapper, ScaleRewardWrapper, ScaleActionWrapper
-# Callbacks propios
-from environments_package import CustomCheckpointCallback, TrainingCallback
-import torch
+from environments_package import (
+    RemoveKeyObservationWrapper,
+    ScaleRewardWrapper,
+    ScaleActionWrapper,
+    CustomCheckpointCallback,
+    TrainingCallback
+)
 
+# Configuraciones generales
+WORLD_PATH = "./simulation_package/worlds/bioloid_env.wbt"
+REWARD_CONFIG_PATH = "./configs/reward_package_config/test_bioloid.json"
+DEFAULT_SAVE_DIR = "./data"
+DEFAULT_TIMESTEPS = 307200
+DEFAULT_N_STEPS = 1024
+DEFAULT_BATCH_SIZE = 256
+DEFAULT_LR = 1e-3
+DEFAULT_ENT_COEF = 0.01
+NUM_ENVS = 1
 
-
-
-
-# Datos y configuraciones generales ////////////////////////////////////////////////////////////////////////////////////
-
-world_dir = "./simulation_package/worlds/bioloid_env.wbt"
-json_reward = "./configs/reward_package_config/test_bioloid.json"
-
-model_dir = "./models/ppomodel"
-log_dir = "./logs/"
-data_collected_dir = "./data_collected/"
-
-timesteps = 1024#307200
-n_steps = 64#1024
-batch_size = 16#256
-lr = 1e-3
-ent_coef = 0.01
-num_envs = 1
-
-
-
-
-#Funciones  ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 def make_env():
-    """Crea una función que retorne un init() para SubprocVecEnv,
-       aplicando wrappers a tu entorno Drone-v1."""
-
+    """Crea y devuelve una función de inicialización del entorno."""
     def _init():
         env = gymnasium.make(
             'tfg_juanes/CustomBioloid-v1',
-            simulation_path=world_dir,
-            reward_json_path=json_reward,
+            simulation_path=WORLD_PATH,
+            reward_json_path=REWARD_CONFIG_PATH,
             no_render=False
         )
-        # Aplica los wrappers necesarios
-        env = RemoveKeyObservationWrapper(env, remove_keys=["gps"])#["camera", "gps"])
+        env = RemoveKeyObservationWrapper(env, remove_keys=["gps"])
         env = ScaleRewardWrapper(env, scale_factor=1.5)
         env = ScaleActionWrapper(env)
         return env
@@ -68,101 +47,92 @@ def make_env():
     return _init
 
 
-
-
-
 def parse_args():
-    parser = argparse.ArgumentParser(description="Script de entrenamiento con Stable Baselines3 y Webots.")
-
-    # Opción para recibir la carpeta de guardado
+    """Parsea argumentos de línea de comandos."""
+    parser = argparse.ArgumentParser(description="Entrenamiento con SB3 y Webots.")
     parser.add_argument(
         "--save-dir",
         type=str,
-        default="./data",
-        help="Directorio donde se guardarán los modelos, logs y otros archivos."
+        default=DEFAULT_SAVE_DIR,
+        help="Directorio para guardar modelos y logs."
     )
-
-    # Puedes añadir más argumentos si lo deseas...
     return parser.parse_args()
 
 
+def prepare_directories(base_dir):
+    """Crea las carpetas necesarias si no existen."""
+    log = os.path.join(base_dir, "logs")
+    data = os.path.join(base_dir, "data_collected")
+    model = os.path.join(base_dir, "models")
+    os.makedirs(log, exist_ok=True)
+    os.makedirs(data, exist_ok=True)
+    os.makedirs(model, exist_ok=True)
+    return log, data, model
 
 
-# callbacks ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-# Lógica principal  ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-if __name__ == "__main__":
-    print(f"[INFO] Dispositivo detectado: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")
-
-    # Parseamos el directorio base
-    args = parse_args()
-    base_save_dir = args.save_dir
-
-    # Creamos las direcciones y las comprobamos
-    log_dir = os.path.join(base_save_dir, "logs")
-    data_collected_dir = os.path.join(base_save_dir, "data_collected")
-    model_dir = os.path.join(base_save_dir, "models")
-
-    os.makedirs(log_dir, exist_ok=True)
-    os.makedirs(data_collected_dir, exist_ok=True)
-    os.makedirs(os.path.dirname(model_dir), exist_ok=True)
-    os.makedirs(model_dir, exist_ok=True)
-
-    # cargar checkpoint
-    checkpoint_file = os.path.join(model_dir, "checkpoint.json")
+def load_checkpoint(model_dir):
+    """Carga información del checkpoint si existe."""
+    checkpoint_path = os.path.join(model_dir, "checkpoint.json")
     model_path = os.path.join(model_dir, "model.zip")
 
-    if os.path.exists(checkpoint_file) and os.path.exists(model_path):
-        with open(checkpoint_file, "r") as f:
-            checkpoint_data = json.load(f)
-            trained_so_far = checkpoint_data.get("timesteps_trained", 0)
-        print(f"[INFO] Checkpoint encontrado. Timesteps entrenados hasta ahora: {trained_so_far}")
-    else:
-        trained_so_far = 0
-        with open(checkpoint_file, "w") as f:
-            json.dump({"timesteps_trained": trained_so_far}, f, indent=2)
-        print("[INFO] No se encontró modelo o checkpoint. Entrenamiento comenzará desde cero.")
+    if os.path.exists(checkpoint_path) and os.path.exists(model_path):
+        with open(checkpoint_path, "r") as f:
+            data = json.load(f)
+        print(f"[INFO] Checkpoint encontrado. Timesteps entrenados: {data.get('timesteps_trained', 0)}")
+        return data.get("timesteps_trained", 0), model_path
 
-    # Crear el entorno vectorizado SubprocVecEnv con 'num_envs' copias
-    env = SubprocVecEnv([make_env() for _ in range(num_envs)], start_method='spawn')
+    with open(checkpoint_path, "w") as f:
+        json.dump({"timesteps_trained": 0}, f, indent=2)
+    print("[INFO] No se encontró modelo. Entrenamiento desde cero.")
+    return 0, model_path
+
+
+def main():
+    print(f"[INFO] Dispositivo: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")
+
+    args = parse_args()
+    log_dir, data_dir, model_dir = prepare_directories(args.save_dir)
+    trained_so_far, model_path = load_checkpoint(model_dir)
+
+    env = SubprocVecEnv([make_env() for _ in range(NUM_ENVS)], start_method='spawn')
     env = VecMonitor(env)
+    logger = configure(log_dir, ["stdout", "csv"])
 
-    new_logger = configure(log_dir, ["stdout", "csv"])
+    callbacks = CallbackList([
+        TrainingCallback(env=env, verbose=1),
+        CustomCheckpointCallback(
+            log_dir=log_dir,
+            data_collected_dir=data_dir,
+            model_dir=model_dir,
+            n_steps=DEFAULT_N_STEPS,
+            last_checkpoint=trained_so_far
+        )
+    ])
 
-    trainning_callback = TrainingCallback(env=env, verbose=1)
-    restart_callback = CustomCheckpointCallback(
-        log_dir=log_dir,
-        data_collected_dir=data_collected_dir,
-        model_dir=model_dir,
-        n_steps=n_steps,
-        last_checkpoint=trained_so_far
-    )
-    callbacks = CallbackList([trainning_callback, restart_callback])
+    remaining_steps = DEFAULT_TIMESTEPS - trained_so_far
 
-    # Entrenar solo si quedan timesteps
-    if (timesteps - trained_so_far) > 0:
+    if remaining_steps > 0:
         if os.path.exists(model_path):
             print(f"[INFO] Cargando modelo desde {model_path}")
             model = RecurrentPPO.load(model_path, env=env)
         else:
-            print("[INFO] No se encontró un modelo previo. Creando uno nuevo...")
+            print("[INFO] Creando nuevo modelo...")
             model = RecurrentPPO(
                 "MultiInputLstmPolicy",
                 env,
                 verbose=1,
-                n_steps=n_steps,
-                batch_size=batch_size,
-                learning_rate=lr,
-                ent_coef=ent_coef
+                n_steps=DEFAULT_N_STEPS,
+                batch_size=DEFAULT_BATCH_SIZE,
+                learning_rate=DEFAULT_LR,
+                ent_coef=DEFAULT_ENT_COEF
             )
 
-        model.set_logger(new_logger)
-        print(f"[INFO] Timesteps restantes: {timesteps - trained_so_far}")
-
-        train_steps = timesteps - trained_so_far
-        model.learn(total_timesteps=train_steps, reset_num_timesteps=False, callback=callbacks)
-
+        model.set_logger(logger)
+        print(f"[INFO] Timesteps por entrenar: {remaining_steps}")
+        model.learn(total_timesteps=remaining_steps, reset_num_timesteps=False, callback=callbacks)
 
     print("[INFO] Entrenamiento finalizado.")
+
+
+if __name__ == "__main__":
+    main()

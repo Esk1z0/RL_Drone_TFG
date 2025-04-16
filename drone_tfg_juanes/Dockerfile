@@ -26,7 +26,7 @@ RUN pip install -r configs/requirements_config/requirements.txt
 
 # Instalar los paquetes locales en modo editable
 RUN pip install -e .
-RUN pip install -e ./simulation_package/controllers/xyz_controller/drone_library
+RUN pip install -e ./simulation_package/controllers/xyz_controller/robot_library
 
 # Exponer los puertos (si es necesario)
 #EXPOSE 8000

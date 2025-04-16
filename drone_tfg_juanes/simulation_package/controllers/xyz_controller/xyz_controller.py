@@ -8,9 +8,9 @@ import numpy as np
 import os
 import psutil
 
-from drone_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, SHM_SIZE
+from robot_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, SHM_SIZE
 
-from drone_library.SharedMemoryCommunication import Comm
+from robot_library.SharedMemoryCommunication import Comm
 
 from manager import get_uid
 

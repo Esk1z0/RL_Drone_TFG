@@ -1,6 +1,6 @@
 import unittest
 import time
-from drone_tfg_juanes.simulation_package.controllers.xyz_controller.drone_library import drone_simulation
+from drone_tfg_juanes.simulation_package.controllers.xyz_controller.robot_library import robot_simulation
 
 world_dir = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/simulation_package/worlds/my_frst_webots_world.wbt"
 
