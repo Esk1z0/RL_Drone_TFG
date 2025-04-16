@@ -19,6 +19,11 @@
           "parameters": {
             "scale": 0.2
           }
+        },
+        {
+          "name": "motor_inactivity_penalty",
+          "parameters": {
+          }
         }
       ]
     }}

@@ -67,7 +67,6 @@ class BioloidEnv(Env):
             truncated (bool): Tells if the simulation crashed for some reason
             info (None): Not implemented
         """
-
         if self.closed or self.bioloid.is_sim_out():
             self.closed = False
             self.bioloid.start_simulation()

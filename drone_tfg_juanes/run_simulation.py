@@ -21,6 +21,8 @@ from stable_baselines3.common.evaluation import evaluate_policy
 from environments_package import RemoveKeyObservationWrapper, ScaleRewardWrapper, ScaleActionWrapper
 # Callbacks propios
 from environments_package import CustomCheckpointCallback, TrainingCallback
+import torch
+
 
 
 
@@ -92,10 +94,11 @@ def parse_args():
 # Lógica principal  ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 if __name__ == "__main__":
+    print(f"[INFO] Dispositivo detectado: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")
+
     # Parseamos el directorio base
     args = parse_args()
     base_save_dir = args.save_dir
-
 
     # Creamos las direcciones y las comprobamos
     log_dir = os.path.join(base_save_dir, "logs")
