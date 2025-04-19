@@ -1,5 +1,5 @@
-import os
 import json
+import os
 import argparse
 
 import gymnasium
@@ -18,49 +18,36 @@ from environments_package import (
     TrainingCallback
 )
 
-# Configuraciones generales
-WORLD_PATH = "./simulation_package/worlds/bioloid_env.wbt"
-REWARD_CONFIG_PATH = "./configs/reward_package_config/test_bioloid.json"
-DEFAULT_SAVE_DIR = "./data"
-DEFAULT_TIMESTEPS = 307200
-DEFAULT_N_STEPS = 1024
-DEFAULT_BATCH_SIZE = 256
-DEFAULT_LR = 1e-3
-DEFAULT_ENT_COEF = 0.01
-NUM_ENVS = 1
+from configs.trainning_config_loader import TrainingConfigLoader
 
 
-def make_env():
-    """Crea y devuelve una función de inicialización del entorno."""
+def make_env(world_path, reward_json_path, no_render):
     def _init():
         env = gymnasium.make(
             'tfg_juanes/CustomBioloid-v1',
-            simulation_path=WORLD_PATH,
-            reward_json_path=REWARD_CONFIG_PATH,
-            no_render=False
+            simulation_path=world_path,
+            reward_json_path=reward_json_path,
+            no_render=no_render
         )
         env = RemoveKeyObservationWrapper(env, remove_keys=["gps"])
         env = ScaleRewardWrapper(env, scale_factor=1.5)
         env = ScaleActionWrapper(env)
         return env
-
     return _init
 
 
 def parse_args():
-    """Parsea argumentos de línea de comandos."""
     parser = argparse.ArgumentParser(description="Entrenamiento con SB3 y Webots.")
     parser.add_argument(
         "--save-dir",
         type=str,
-        default=DEFAULT_SAVE_DIR,
+        default=".",
         help="Directorio para guardar modelos y logs."
     )
     return parser.parse_args()
 
 
 def prepare_directories(base_dir):
-    """Crea las carpetas necesarias si no existen."""
     log = os.path.join(base_dir, "logs")
     data = os.path.join(base_dir, "data_collected")
     model = os.path.join(base_dir, "models")
@@ -71,7 +58,6 @@ def prepare_directories(base_dir):
 
 
 def load_checkpoint(model_dir):
-    """Carga información del checkpoint si existe."""
     checkpoint_path = os.path.join(model_dir, "checkpoint.json")
     model_path = os.path.join(model_dir, "model.zip")
 
@@ -91,10 +77,19 @@ def main():
     print(f"[INFO] Dispositivo: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")
 
     args = parse_args()
+    config_loader = TrainingConfigLoader(os.path.join(args.save_dir, "config.json"))
+    config = config_loader.load()
+
     log_dir, data_dir, model_dir = prepare_directories(args.save_dir)
     trained_so_far, model_path = load_checkpoint(model_dir)
 
-    env = SubprocVecEnv([make_env() for _ in range(NUM_ENVS)], start_method='spawn')
+    env = SubprocVecEnv([
+        make_env(
+            config.env_config.get("world_path"),
+            os.path.join(args.save_dir, config.env_config.get("reward_json_path")),
+            config.env_config.get("no_render", False)
+        ) for _ in range(config.train_config.get("num_envs", 1))
+    ], start_method='spawn')
     env = VecMonitor(env)
     logger = configure(log_dir, ["stdout", "csv"])
 
@@ -104,27 +99,28 @@ def main():
             log_dir=log_dir,
             data_collected_dir=data_dir,
             model_dir=model_dir,
-            n_steps=DEFAULT_N_STEPS,
+            n_steps=config.model_config.get("params", {}).get("n_steps", 2048),
             last_checkpoint=trained_so_far
         )
     ])
 
-    remaining_steps = DEFAULT_TIMESTEPS - trained_so_far
+    remaining_steps = config.train_config.get("timesteps", 100000) - trained_so_far
+
+    model_class = globals().get(config.model_config.get("algorithm"))
+    if model_class is None:
+        raise ValueError(f"Algoritmo desconocido: {config.model_config.get('algorithm')}")
 
     if remaining_steps > 0:
         if os.path.exists(model_path):
             print(f"[INFO] Cargando modelo desde {model_path}")
-            model = RecurrentPPO.load(model_path, env=env)
+            model = model_class.load(model_path, env=env)
         else:
             print("[INFO] Creando nuevo modelo...")
-            model = RecurrentPPO(
-                "MultiInputLstmPolicy",
+            model = model_class(
+                config.model_config.get("policy"),
                 env,
                 verbose=1,
-                n_steps=DEFAULT_N_STEPS,
-                batch_size=DEFAULT_BATCH_SIZE,
-                learning_rate=DEFAULT_LR,
-                ent_coef=DEFAULT_ENT_COEF
+                **config.model_config.get("params", {})
             )
 
         model.set_logger(logger)

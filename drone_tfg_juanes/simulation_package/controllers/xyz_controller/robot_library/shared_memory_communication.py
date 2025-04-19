@@ -3,7 +3,7 @@ import os
 import platform
 import pickle
 from threading import Event
-from Mmap_Semaphore import BinarySemaphore
+from mmap_semaphore import BinarySemaphore
 
 
 class Comm:

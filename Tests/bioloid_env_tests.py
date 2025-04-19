@@ -3,10 +3,10 @@ import time
 
 import numpy as np
 
-from drone_tfg_juanes.environments_package.Bioloid_Env import BioloidEnv
-from drone_tfg_juanes.environments_package.Wrappers.RemoveKeyObservationWrapper import RemoveKeyObservationWrapper
-from drone_tfg_juanes.environments_package.Wrappers.ScaleActionWrapper import ScaleActionWrapper
-from drone_tfg_juanes.environments_package.Wrappers.ScaleRewardWrapper import ScaleRewardWrapper
+from drone_tfg_juanes.environments_package.bioloid_env import BioloidEnv
+from drone_tfg_juanes.environments_package.wrappers.remove_key_observation_wrapper import RemoveKeyObservationWrapper
+from drone_tfg_juanes.environments_package.wrappers.scale_action_wrapper import ScaleActionWrapper
+from drone_tfg_juanes.environments_package.wrappers.scale_reward_wrapper import ScaleRewardWrapper
 
 world_dir = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/simulation_package/worlds/bioloid_env.wbt"
 json_path = "/Users/jeste/Desktop/Clase/TFG/drone_tfg_juanes/configs/reward_package_config/test_bioloid.json"

@@ -5,7 +5,7 @@ import pickle
 import psutil
 
 from config import *
-from SharedMemoryCommunication import Comm
+from shared_memory_communication import Comm
 from executor import CommandExecutor
 
 import os

@@ -1,7 +1,7 @@
 import time
 
 from robot_simulation import Bioloid
-from .Env_Reward_package.reward_builder import RewardLoader
+from .env_reward_package.reward_builder import RewardLoader
 import numpy as np
 from gymnasium import Env, spaces
 

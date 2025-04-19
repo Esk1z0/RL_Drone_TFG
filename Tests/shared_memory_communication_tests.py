@@ -1,6 +1,6 @@
 import unittest
-from drone_tfg_juanes.simulation_package.controllers.xyz_controller.robot_library.Mmap_Semaphore import BinarySemaphore
-from drone_tfg_juanes.simulation_package.controllers.xyz_controller.robot_library.SharedMemoryCommunication import Comm
+from drone_tfg_juanes.simulation_package.controllers.xyz_controller.robot_library.mmap_semaphore import BinarySemaphore
+from drone_tfg_juanes.simulation_package.controllers.xyz_controller.robot_library.shared_memory_communication import Comm
 import threading
 import pickle
 import time

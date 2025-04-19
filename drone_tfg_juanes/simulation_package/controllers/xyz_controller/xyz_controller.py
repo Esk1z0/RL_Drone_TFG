@@ -10,7 +10,7 @@ import psutil
 
 from robot_library.config import TIME_OUT, TIME_STEP, ACTUATORS, SENSORS, SHM_SIZE
 
-from robot_library.SharedMemoryCommunication import Comm
+from robot_library.shared_memory_communication import Comm
 
 from manager import get_uid
 
