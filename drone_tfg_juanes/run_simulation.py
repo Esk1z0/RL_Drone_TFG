@@ -83,15 +83,12 @@ def main():
         obs = env.reset()
         done = False
         total_reward = 0
-        print(obs)
 
         while not done:
             action, _ = model.predict(obs, deterministic=True)
-            print("action: ",action)
             obs, reward, terminated, truncated = env.step(action)
             done = any(terminated) or any(t.get("TimeLimit.truncated", False) for t in truncated)
             total_reward += reward[0] if isinstance(reward, (list, np.ndarray)) else reward
-            print("total_reward: ", total_reward)
         env.close()
         print(f"[INFO] Evaluación finalizada. Recompensa total: {total_reward}")
 
