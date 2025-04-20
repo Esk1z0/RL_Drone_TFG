@@ -4,9 +4,16 @@ import json
 from datetime import datetime
 from stable_baselines3.common.callbacks import BaseCallback
 
+
 def move_and_rename_csv(src_dir, dst_dir, new_name):
     """
-    Busca 'progress.csv' en src_dir y lo copia/renombra a dst_dir/new_name.
+    Busca el archivo 'progress.csv' en el directorio de origen y lo copia al directorio de destino
+    con un nuevo nombre especificado.
+
+    Args:
+        src_dir (str): Ruta del directorio de origen que contiene 'progress.csv'.
+        dst_dir (str): Ruta del directorio de destino donde se guardará el archivo.
+        new_name (str): Nuevo nombre con el que se guardará el archivo en el destino.
     """
     csv_file = 'progress.csv'
     src_path = os.path.join(src_dir, csv_file)
@@ -19,74 +26,96 @@ def move_and_rename_csv(src_dir, dst_dir, new_name):
     shutil.copy2(src_path, dst_path)
     print(f"Archivo copiado y renombrado a {dst_path}")
 
+
 class CustomCheckpointCallback(BaseCallback):
     """
-    Callback que guarda el modelo, actualiza los logs y un checkpoint de entrenamiento
-    después de cada rollout.
-      - Guarda el modelo en el directorio de modelos.
-      - Actualiza el archivo de logs en el directorio data_collected, utilizando un nombre
-        que incluye la fecha y hora (fijado al inicio del entrenamiento).
-      - Actualiza el checkpoint en un archivo JSON, acumulando solo los incrementos de timesteps
-        desde el último guardado.
+    Callback personalizado para gestionar checkpoints y registro de logs durante el entrenamiento.
+
+    Funcionalidades:
+    - Guarda el modelo tras cada rollout
+    - Copia el archivo de progreso ('progress.csv') a un archivo nombrado con fecha/hora.
+    - Actualiza un checkpoint con los timesteps entrenados acumulados.
+
+    Args:
+        log_dir (str): Directorio de salida de logs generados por el modelo.
+        data_collected_dir (str): Directorio donde se guardan los logs renombrados por fecha.
+        model_dir (str): Directorio donde se guarda el modelo y el checkpoint.
+        n_steps (int): Número de pasos por cada rollout.
+        last_checkpoint (int): Número de timesteps ya entrenados (para continuar entrenamiento).
+        verbose (int): Nivel de detalle en las salidas por consola.
     """
-    def __init__(self, log_dir, data_collected_dir, model_dir, n_steps, last_checkpoint=0,verbose=1):
-        """
-        :param log_dir: Directorio donde se guardan los logs.
-        :param data_collected_dir: Directorio donde se guarda el archivo de logs acumulativos.
-        :param model_dir: Directorio donde se guardan los modelos y el checkpoint.
-        :param verbose: Nivel de detalle de impresión.
-        """
+
+    def __init__(self, log_dir, data_collected_dir, model_dir, n_steps, last_checkpoint=0, verbose=1) -> None:
         super().__init__(verbose)
         self.log_dir = log_dir
         self.data_collected_dir = data_collected_dir
         self.model_dir = model_dir
+        self.n_steps = n_steps
+        self.last_checkpoint_value = last_checkpoint
 
-        # Archivo de checkpoint (se asume que model_dir existe)
         self.checkpoint_file = os.path.join(model_dir, "checkpoint.json")
-
-        # Fijar un nombre único para el archivo de logs acumulativos, con fecha y hora
         self.data_collected_file = f"data_collected_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
 
-        # Inicializar variable interna para el valor en el último checkpoint
-        self.last_checkpoint_value = last_checkpoint
-        self.n_steps = n_steps
-
     def _on_step(self) -> bool:
+        """
+        Este método se ejecuta en cada paso de entrenamiento.
+        No se hace nada aquí, solo se devuelve True para continuar.
+        """
         return True
 
     def _on_rollout_end(self) -> None:
-        """Se ejecuta al inicio de cada rollout (cuando se generan nuevos logs)."""
+        """
+        Se ejecuta al final de cada rollout. Guarda modelo y actualiza checkpoint.
+        """
         self._save_checkpoint()
 
     def _on_training_end(self) -> None:
-        """Se ejecuta al finalizar el entrenamiento para guardar el último estado."""
+        """
+        Se ejecuta al finalizar el entrenamiento completo.
+        Guarda el modelo final y actualiza los logs/estado.
+        """
         self._save_checkpoint(final=True)
 
     def _save_checkpoint(self, final=False) -> None:
         """
-        Guarda el modelo, actualiza el archivo de logs y almacena un archivo JSON
-        con el número acumulado de timesteps entrenados. Se suma la diferencia de timesteps
-        (delta) desde la última actualización para evitar duplicados.
+        Guarda el modelo, copia logs y actualiza el checkpoint JSON.
+
+        Args:
+            final (bool): Si es True, guarda como 'model_final.zip'.
         """
-        # Actualizar logs: copiar el progress.csv al archivo único, cuyo nombre se ha fijado en __init__
+        self._copy_training_logs()
+        self._save_model(final)
+        self._update_checkpoint_file()
+
+    def _copy_training_logs(self) -> None:
+        """Copia el archivo progress.csv a data_collected con nombre único."""
         move_and_rename_csv(
             self.log_dir,
             self.data_collected_dir,
             self.data_collected_file
         )
 
-        # Obtener el valor actual de timesteps
+    def _save_model(self, final=False) -> None:
+        """
+        Guarda el modelo entrenado.
 
-        timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-        # Guardar modelo con un nombre (si final, "model_final.zip"; de lo contrario, "model.zip")
+        Args:
+            final (bool): Determina si se guarda como modelo final.
+        """
         model_name = "model_final.zip" if final else "model.zip"
         model_path = os.path.join(self.model_dir, model_name)
         self.model.save(model_path)
+
         if self.verbose > 0:
             print(f"[CustomCheckpointCallback] Modelo guardado en: {model_path}")
 
-        # Leer el valor previo de los timesteps desde el checkpoint
+    def _update_checkpoint_file(self) -> None:
+        """
+        Actualiza el archivo checkpoint.json con los timesteps acumulados y timestamp actual.
+        """
+        timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        # Intentar leer el checkpoint anterior
         previous_total = 0
         if os.path.exists(self.checkpoint_file):
             try:
@@ -95,11 +124,10 @@ class CustomCheckpointCallback(BaseCallback):
                     previous_total = checkpoint_data.get("timesteps_trained", 0)
             except Exception as e:
                 print(f"[WARNING] No se pudo leer el JSON, reiniciando los timesteps: {e}")
-                previous_total = 0
 
         self.last_checkpoint_value += self.n_steps
 
-        # Guardar el nuevo checkpoint
+        # Escribir el nuevo estado
         checkpoint_data = {
             "timesteps_trained": int(self.last_checkpoint_value),
             "last_save_time": timestamp_str

@@ -1,6 +1,6 @@
 import gymnasium
 import numpy as np
-from gymnasium.spaces import Discrete, Box
+from gymnasium.spaces import Box
 
 
 class BinaryActionWrapper(gymnasium.ActionWrapper):

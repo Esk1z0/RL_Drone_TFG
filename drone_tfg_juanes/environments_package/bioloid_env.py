@@ -15,7 +15,7 @@ class BioloidEnv(Env):
                 simulation_path (str): It tells where the webots simulation will be found
                 reward_json_path (str): It tells where the reward function configuration is
         """
-        #super().__init__()
+
         self.observation_space = spaces.Dict({
             "back_left_1_sensor": spaces.Box(low=-3.14, high=3.14, shape=(1,), dtype=np.float32),
             "back_left_2_sensor": spaces.Box(low=-3.14, high=3.14, shape=(1,), dtype=np.float32),
