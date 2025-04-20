@@ -33,4 +33,4 @@ RUN pip install -e ./simulation_package/controllers/xyz_controller/robot_library
 #EXPOSE 8001
 
 # Comando por defecto
-CMD ["python", "run_simulation.py", "--save-dir", "/home/drone_tfg_juanes/data"]
+CMD ["python", "run_simulation.py", "--save-dir", "/home/drone_tfg_juanes/data", "--mode", "train"]

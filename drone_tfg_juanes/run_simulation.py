@@ -59,6 +59,36 @@ def create_env(config, save_dir):
     return VecMonitor(env)
 
 
+def train_model(model, model_factory, config):
+    """Ejecuta el entrenamiento del modelo si aún quedan timesteps disponibles."""
+    remaining_steps = config.train_config.get("timesteps") - model_factory.get_trained_steps()
+    if remaining_steps > 0:
+        print(f"[INFO] Timesteps por entrenar: {remaining_steps}")
+        model.learn(
+            total_timesteps=remaining_steps,
+            reset_num_timesteps=False,
+            callback=model_factory._get_callbacks()
+        )
+    print("[INFO] Entrenamiento finalizado.")
+
+
+def evaluate_model(model, env):
+    """Ejecuta una evaluación del modelo entrenado y muestra la recompensa total."""
+    obs = env.reset()
+    done = False
+    total_reward = 0
+
+    while not done:
+        action, _ = model.predict(obs, deterministic=True)
+        obs, reward, terminated, truncated = env.step(action)
+
+        done = any(terminated) or any(t.get("TimeLimit.truncated", False) for t in truncated)
+        total_reward += reward[0] if isinstance(reward, (list, np.ndarray)) else reward
+
+    env.close()
+    print(f"[INFO] Evaluación finalizada. Recompensa total: {total_reward}")
+
+
 def main():
     print(f"[INFO] Dispositivo: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")
 
@@ -69,28 +99,12 @@ def main():
     config = TrainingConfigLoader(os.path.join(save_dir, "config.json")).load()
     env = create_env(config, save_dir)
     model_factory = RLModelFactory(config, env, save_dir)
-
     model, _ = model_factory.create_or_load_model()
 
     if mode == "train":
-        remaining_steps = config.train_config.get("timesteps") - model_factory.get_trained_steps()
-        if remaining_steps > 0:
-            print(f"[INFO] Timesteps por entrenar: {remaining_steps}")
-            model.learn(total_timesteps=remaining_steps, reset_num_timesteps=False, callback=model_factory._get_callbacks())
-        print("[INFO] Entrenamiento finalizado.")
-
+        train_model(model, model_factory, config)
     elif mode == "eval":
-        obs = env.reset()
-        done = False
-        total_reward = 0
-
-        while not done:
-            action, _ = model.predict(obs, deterministic=True)
-            obs, reward, terminated, truncated = env.step(action)
-            done = any(terminated) or any(t.get("TimeLimit.truncated", False) for t in truncated)
-            total_reward += reward[0] if isinstance(reward, (list, np.ndarray)) else reward
-        env.close()
-        print(f"[INFO] Evaluación finalizada. Recompensa total: {total_reward}")
+        evaluate_model(model, env)
 
 
 if __name__ == "__main__":
