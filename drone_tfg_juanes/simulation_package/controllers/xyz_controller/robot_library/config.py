@@ -1,6 +1,6 @@
 # Constantes xyz_controller
 TIME_OUT = 3000
-TIME_STEP = 10
+TIME_STEP = 1
 SHM_SIZE = 2048
 
 SENSORS = ["back_left_1_sensor",

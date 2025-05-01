@@ -75,7 +75,7 @@ class BioloidEnv(Env):
         reward, terminated, truncated = 0, False, False
 
         self.bioloid.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": action})
-        observation = self._get_obs()
+        observation = self.bioloid.receive()
 
         truncated = self.is_truncated()
         if not truncated:
@@ -103,7 +103,7 @@ class BioloidEnv(Env):
 
         self.bioloid.send({"ACTION": "RESET", "PARAMS": ""})
 
-        obs = self._get_obs()
+        obs = self.bioloid.receive()
 
         self.reward_function.start_reward(obs)
         return obs, {}
@@ -132,9 +132,6 @@ class BioloidEnv(Env):
             self.bioloid.end_simulation()
         self.closed = True
 
-    def _get_obs(self) -> dict:
-        """Get the state of the environment from the simulation and returns it"""
-        return self.bioloid.receive()
 
     def int_to_binary_list(self, n, length=8):
         # Formatear el número a binario con longitud específica

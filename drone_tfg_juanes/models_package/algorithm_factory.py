@@ -114,6 +114,7 @@ class RLModelFactory:
         Returns:
             CallbackList: Lista de callbacks a utilizar durante el entrenamiento.
         """
+        callback_params = self.config.callback_config
         return CallbackList([
             TrainingCallback(env=self.env, verbose=1),
             CustomCheckpointCallback(
@@ -121,6 +122,9 @@ class RLModelFactory:
                 data_collected_dir=self.data_dir,
                 model_dir=self.model_dir,
                 n_steps=self.config.model_config.get("params", {}).get("n_steps", 2048),
-                last_checkpoint=self.get_trained_steps()
+                last_checkpoint=self.get_trained_steps(),
+                save_timestamp_every_n_steps=callback_params.get("save_timestamp_every_n_steps", 10000),
+                verbose=callback_params.get("verbose", 1)
             )
         ])
+

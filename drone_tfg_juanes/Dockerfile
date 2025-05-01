@@ -28,9 +28,9 @@ RUN pip install -r configs/requirements_config/requirements.txt
 RUN pip install -e .
 RUN pip install -e ./simulation_package/controllers/xyz_controller/robot_library
 
-# Exponer los puertos (si es necesario)
-#EXPOSE 8000
-#EXPOSE 8001
+# Añadir argumento y variable de entorno
+ARG MODE=train
+ENV MODE=${MODE}
 
-# Comando por defecto
-CMD ["python", "run_simulation.py", "--save-dir", "/home/drone_tfg_juanes/data", "--mode", "train"]
+# Comando por defecto usando la variable
+CMD ["sh", "-c", "python run_simulation.py --save-dir /home/drone_tfg_juanes/data --mode $MODE"]

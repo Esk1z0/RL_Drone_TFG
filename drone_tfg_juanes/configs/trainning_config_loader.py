@@ -3,9 +3,11 @@ import json
 
 class TrainingConfig:
     def __init__(self, config_json):
+        self.config = config_json
         self.env_config = config_json.get("env", {})
         self.model_config = config_json.get("model", {})
         self.train_config = config_json.get("training", {})
+        self.callback_config = config_json.get("callback", {})
 
 
 class TrainingConfigLoader:
