@@ -6,7 +6,14 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 
 def move_and_rename_csv(src_dir, dst_dir, new_name):
-    """Copia el archivo 'progress.csv' desde src_dir a dst_dir renombrado como new_name."""
+    """
+    Copia el archivo 'progress.csv' desde src_dir a dst_dir con un nuevo nombre.
+
+    Args:
+        src_dir (str): Ruta de origen donde se encuentra 'progress.csv'.
+        dst_dir (str): Ruta destino donde se copiará el archivo.
+        new_name (str): Nombre del archivo de salida.
+    """
     src_path = os.path.join(src_dir, 'progress.csv')
     dst_path = os.path.join(dst_dir, new_name)
 
@@ -19,10 +26,22 @@ def move_and_rename_csv(src_dir, dst_dir, new_name):
 
 class CustomCheckpointCallback(BaseCallback):
     """
-    Callback que guarda el modelo, logs y checkpoint JSON tras acumular 'n_steps'.
-    También guarda un modelo adicional con timestamp cada 'save_timestamp_every_n_steps'.
+    Callback personalizado para guardar modelos, logs y checkpoint de timesteps periódicamente.
 
-    Compatible con PPO, SAC, TD3, etc.
+    Guarda:
+    - El modelo principal ('model.zip' o 'model_final.zip').
+    - Un archivo CSV de progreso ('progress.csv') renombrado.
+    - Un archivo JSON con los timesteps acumulados.
+    - Un modelo adicional con timestamp, si ha pasado suficiente tiempo.
+
+    Args:
+        log_dir (str): Carpeta donde se generan los logs de entrenamiento (donde está 'progress.csv').
+        data_collected_dir (str): Carpeta donde se guardarán las copias renombradas de los logs.
+        model_dir (str): Carpeta donde se guardarán los modelos (.zip) y el archivo checkpoint (.json).
+        n_steps (int): Número de rollouts tras los cuales se guardará un nuevo checkpoint.
+        last_checkpoint (int): Número de timesteps ya entrenados (útil al continuar un entrenamiento anterior).
+        save_timestamp_every_n_steps (int): Cada cuántos timesteps se guarda una copia adicional del modelo con timestamp.
+        verbose (int): Nivel de verbosidad (0 = silencioso, 1 = imprime mensajes).
     """
     def __init__(self, log_dir, data_collected_dir, model_dir, n_steps,
                  last_checkpoint=0, save_timestamp_every_n_steps=10000, verbose=1):
@@ -40,19 +59,19 @@ class CustomCheckpointCallback(BaseCallback):
         self.data_collected_file = f"data_collected_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
 
     def _on_step(self) -> bool:
-        self.step_counter += 1
+        return True
 
+    def _on_rollout_end(self) -> None:
+        self.step_counter += 1
         if self.step_counter >= self.n_steps:
             self._save_checkpoint()
             self.step_counter = 0
-
-        return True
 
     def _on_training_end(self) -> None:
         self._save_checkpoint(final=True)
 
     def _save_checkpoint(self, final=False) -> None:
-        """Guarda modelo, log y checkpoint acumulado."""
+        """Guarda modelo, logs y checkpoint acumulado."""
         self._copy_training_logs()
         self._save_model(final)
         self._update_checkpoint_file()

@@ -6,6 +6,7 @@ from stable_baselines3.common.callbacks import CallbackList
 from stable_baselines3.common.base_class import BaseAlgorithm
 from stable_baselines3 import PPO, A2C, DQN, HER, DDPG, SAC, TD3
 from sb3_contrib import RecurrentPPO, TRPO, TQC, QRDQN, ARS
+from torch.backends.mkl import verbose
 
 from environments_package import CustomCheckpointCallback, TrainingCallback
 
@@ -74,12 +75,6 @@ class RLModelFactory:
             print("[INFO] No se encontró modelo. Entrenamiento desde cero.")
 
     def create_or_load_model(self) -> (BaseAlgorithm, CallbackList):
-        """
-        Crea un nuevo modelo o carga uno existente desde disco, según lo especificado en la configuración.
-
-        Returns:
-            Tuple[BaseAlgorithm, CallbackList]: Modelo de RL y lista de callbacks asociados.
-        """
         algo_name = self.config.model_config.get("algorithm")
         policy = self.config.model_config.get("policy")
         params = self.config.model_config.get("params", {})
@@ -90,12 +85,15 @@ class RLModelFactory:
 
         if os.path.exists(self.model_path):
             print(f"[INFO] Cargando modelo desde {self.model_path}")
-            model = model_class.load(self.model_path, env=self.env)
+            model = model_class.load(self.model_path, env=self.env, verbose=1)
+            logger = configure(self.log_dir, ["stdout", "csv"])
+            model.set_logger(logger)
         else:
             print("[INFO] Creando nuevo modelo...")
             model = model_class(policy, self.env, verbose=1, **params)
+            logger = configure(self.log_dir, ["stdout", "csv"])
+            model.set_logger(logger)
 
-        model.set_logger(configure(self.log_dir, ["stdout", "csv"]))
         return model, self._get_callbacks()
 
     def get_trained_steps(self) -> int:
@@ -121,7 +119,7 @@ class RLModelFactory:
                 log_dir=self.log_dir,
                 data_collected_dir=self.data_dir,
                 model_dir=self.model_dir,
-                n_steps=self.config.model_config.get("params", {}).get("n_steps", 2048),
+                n_steps=callback_params.get("n_steps", 2048),
                 last_checkpoint=self.get_trained_steps(),
                 save_timestamp_every_n_steps=callback_params.get("save_timestamp_every_n_steps", 10000),
                 verbose=callback_params.get("verbose", 1)

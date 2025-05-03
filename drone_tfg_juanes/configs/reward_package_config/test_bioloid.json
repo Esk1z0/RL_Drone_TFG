@@ -23,6 +23,8 @@
         {
           "name": "motor_inactivity_penalty",
           "parameters": {
+		"penalty": -0.2,
+		"max_inactive_steps": 40
           }
         }
       ]

@@ -1,0 +1,32 @@
+{
+  "env": {
+    "world_path": "./simulation_package/worlds/bioloid_env.wbt",
+    "reward_json_path": "./test_bioloid.json",
+    "no_render": true
+  },
+  "model": {
+    "algorithm": "PPO",
+    "policy": "MultiInputPolicy",
+    "params": {
+      "learning_rate": 0.0003,
+      "n_steps": 1024,
+      "batch_size": 64,
+      "n_epochs": 10,
+      "gamma": 0.99,
+      "gae_lambda": 0.95,
+      "clip_range": 0.2,
+      "ent_coef": 0.0,
+      "vf_coef": 0.5,
+      "max_grad_norm": 0.5
+    }
+  },
+  "training": {
+    "timesteps": 10000,
+    "num_envs": 1
+  },
+  "callback": {
+    "n_steps": 1024,
+    "save_timestamp_every_n_steps": 8192,
+    "verbose": 1
+  }
+}

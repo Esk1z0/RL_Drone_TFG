@@ -56,10 +56,11 @@ def create_env(config, save_dir):
             config.env_config.get("no_render", False)
         ) for _ in range(config.train_config.get("num_envs", 1))
     ], start_method='spawn')
-    return VecMonitor(env)
+    env = VecMonitor(env)
+    return env
 
 
-def train_model(model, model_factory, config):
+def train_model(model, callbacks, model_factory, config):
     """Ejecuta el entrenamiento del modelo si aún quedan timesteps disponibles."""
     remaining_steps = config.train_config.get("timesteps") - model_factory.get_trained_steps()
     if remaining_steps > 0:
@@ -67,7 +68,8 @@ def train_model(model, model_factory, config):
         model.learn(
             total_timesteps=remaining_steps,
             reset_num_timesteps=False,
-            callback=model_factory._get_callbacks()
+            callback=callbacks,
+            log_interval=1
         )
     print("[INFO] Entrenamiento finalizado.")
 
@@ -99,10 +101,10 @@ def main():
     config = TrainingConfigLoader(os.path.join(save_dir, "config.json")).load()
     env = create_env(config, save_dir)
     model_factory = RLModelFactory(config, env, save_dir)
-    model, _ = model_factory.create_or_load_model()
+    model, callbacks = model_factory.create_or_load_model()
 
     if mode == "train":
-        train_model(model, model_factory, config)
+        train_model(model, callbacks, model_factory, config)
     elif mode == "eval":
         evaluate_model(model, env)
 

@@ -7,7 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/drone_tfg_juanes/environments_package" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/drone_tfg_juanes/simulation_package/controllers/xyz_controller/robot_library" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="tfg_model" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="tfg_model_test" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">

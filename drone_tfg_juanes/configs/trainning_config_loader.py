@@ -8,6 +8,7 @@ class TrainingConfig:
         self.model_config = config_json.get("model", {})
         self.train_config = config_json.get("training", {})
         self.callback_config = config_json.get("callback", {})
+        print(self.callback_config.get("n_steps"))
 
 
 class TrainingConfigLoader:

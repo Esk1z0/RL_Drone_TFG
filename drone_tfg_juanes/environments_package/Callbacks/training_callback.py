@@ -13,7 +13,7 @@ class TrainingCallback(BaseCallback):
         return True
 
     def _on_rollout_start(self) -> None:
-        self.env.reset()
+        pass#self.env.reset()
 
     def _on_training_end(self):
         print("Entrenamiento finalizado. Cerrando el entorno...")

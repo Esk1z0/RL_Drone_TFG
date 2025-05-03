@@ -1,0 +1,32 @@
+{
+  "env": {
+    "world_path": "./simulation_package/worlds/bioloid_env.wbt",
+    "reward_json_path": "./test_bioloid.json",
+    "no_render": true
+  },
+  "model": {
+    "algorithm": "TD3",
+    "policy": "MultiInputPolicy",
+    "params": {
+      "learning_rate": 0.001,
+      "buffer_size": 100000,
+      "batch_size": 100,
+      "tau": 0.005,
+      "gamma": 0.99,
+      "train_freq": 1,
+      "gradient_steps": 1,
+      "learning_starts": 1000,
+      "action_noise": null,
+      "stats_window_size": 10
+    }
+  },
+  "training": {
+    "timesteps": 10000,
+    "num_envs": 1
+  },
+  "callback": {
+    "n_steps": 1000,
+    "save_timestamp_every_n_steps": 5000,
+    "verbose": 1
+  }
+}

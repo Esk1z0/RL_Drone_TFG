@@ -71,9 +71,7 @@ class BioloidEnv(Env):
             self.closed = False
             self.bioloid.start_simulation()
 
-        #TODO comprobar si un pequenio delay ayuda al entrenamiento
         reward, terminated, truncated = 0, False, False
-
         self.bioloid.send({"ACTION": "SET_ALL_MOTORS", "PARAMS": action})
         observation = self.bioloid.receive()
 
@@ -106,6 +104,7 @@ class BioloidEnv(Env):
         obs = self.bioloid.receive()
 
         self.reward_function.start_reward(obs)
+
         return obs, {}
 
     def _get_reward(self, observation) -> (float, bool):
@@ -131,7 +130,6 @@ class BioloidEnv(Env):
         if not self.bioloid.is_sim_out():
             self.bioloid.end_simulation()
         self.closed = True
-
 
     def int_to_binary_list(self, n, length=8):
         # Formatear el número a binario con longitud específica
