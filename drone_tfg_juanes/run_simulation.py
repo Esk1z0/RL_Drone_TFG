@@ -7,7 +7,9 @@ import torch
 from stable_baselines3.common.env_util import SubprocVecEnv
 from stable_baselines3.common.vec_env import VecMonitor
 
-from environments_package import RemoveKeyObservationWrapper, ScaleActionWrapper
+from environments_package.wrappers.remove_key_observation_wrapper import RemoveKeyObservationWrapper
+from environments_package.wrappers.scale_action_wrapper import ScaleActionWrapper
+from environments_package.wrappers.fixed_head_neck_action_wrapper import FixHeadNeckActionWrapper
 from configs.trainning_config_loader import TrainingConfigLoader
 from models_package.algorithm_factory import RLModelFactory
 
@@ -43,6 +45,7 @@ def make_env(world_path, reward_json_path, no_render):
         # Aplicamos los wrappers necesarios al entorno
         env = RemoveKeyObservationWrapper(env, remove_keys=["gps"])
         env = ScaleActionWrapper(env)
+        env = FixHeadNeckActionWrapper(env, fixed_values={12: 0.0, 13: -1, 14: 0.0})
         return env
     return _init
 
