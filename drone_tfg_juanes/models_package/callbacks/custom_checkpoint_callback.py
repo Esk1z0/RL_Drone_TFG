@@ -43,29 +43,29 @@ class CustomCheckpointCallback(BaseCallback):
         save_timestamp_every_n_steps (int): Cada cuántos timesteps se guarda una copia adicional del modelo con timestamp.
         verbose (int): Nivel de verbosidad (0 = silencioso, 1 = imprime mensajes).
     """
-    def __init__(self, log_dir, data_collected_dir, model_dir, n_steps,
+    def __init__(self, log_dir, data_collected_dir, model_dir, n_rollouts,
                  last_checkpoint=0, save_timestamp_every_n_steps=10000, verbose=1):
         super().__init__(verbose)
         self.log_dir = log_dir
         self.data_collected_dir = data_collected_dir
         self.model_dir = model_dir
-        self.n_steps = n_steps
+        self.n_rollouts = n_rollouts
         self.last_checkpoint_value = last_checkpoint
         self.save_timestamp_every_n_steps = save_timestamp_every_n_steps
-        self.last_timestamp_checkpoint = last_checkpoint
+        self.last_timestamp_checkpoint = (last_checkpoint // save_timestamp_every_n_steps) * save_timestamp_every_n_steps
         self.rollout_counter = 0
-        self.num_timesteps = 0
+        self.num_timesteps_own = last_checkpoint
 
         self.checkpoint_file = os.path.join(model_dir, "checkpoint.json")
         self.data_collected_file = f"data_collected_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
 
     def _on_step(self) -> bool:
-        self.num_timesteps += 1
+        self.num_timesteps_own += 1
         return True
 
     def _on_rollout_end(self) -> None:
         self.rollout_counter += 1
-        if self.rollout_counter >= self.n_steps:
+        if self.rollout_counter >= self.n_rollouts:
             self._save_checkpoint()
             self.rollout_counter = 0
 
@@ -100,7 +100,7 @@ class CustomCheckpointCallback(BaseCallback):
 
     def _update_checkpoint_file(self) -> None:
         timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.last_checkpoint_value += self.num_timesteps
+        self.last_checkpoint_value = self.num_timesteps_own
         checkpoint_data = {
             "timesteps_trained": int(self.last_checkpoint_value),
             "last_save_time": timestamp_str

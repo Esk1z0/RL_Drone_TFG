@@ -120,7 +120,7 @@ class RLModelFactory:
                 log_dir=self.log_dir,
                 data_collected_dir=self.data_dir,
                 model_dir=self.model_dir,
-                n_steps=callback_params.get("n_steps", 2048),
+                n_rollouts=callback_params.get("n_rollouts", 2048),
                 last_checkpoint=self.get_trained_steps(),
                 save_timestamp_every_n_steps=callback_params.get("save_timestamp_every_n_steps", 10000),
                 verbose=callback_params.get("verbose", 1)
