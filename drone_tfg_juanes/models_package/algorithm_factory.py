@@ -4,11 +4,12 @@ import json
 from stable_baselines3.common.logger import configure
 from stable_baselines3.common.callbacks import CallbackList
 from stable_baselines3.common.base_class import BaseAlgorithm
-from stable_baselines3 import PPO, A2C, DQN, HER, DDPG, SAC, TD3
-from sb3_contrib import RecurrentPPO, TRPO, TQC, QRDQN, ARS
-from torch.backends.mkl import verbose
+from stable_baselines3 import PPO, A2C, DDPG, SAC, TD3
+from sb3_contrib import RecurrentPPO, TRPO, TQC
 
-from environments_package import CustomCheckpointCallback, TrainingCallback
+
+from models_package.callbacks.custom_checkpoint_callback import CustomCheckpointCallback
+from models_package.callbacks.training_callback import  TrainingCallback
 
 
 class RLModelFactory:

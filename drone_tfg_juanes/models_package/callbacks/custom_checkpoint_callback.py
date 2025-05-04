@@ -53,19 +53,21 @@ class CustomCheckpointCallback(BaseCallback):
         self.last_checkpoint_value = last_checkpoint
         self.save_timestamp_every_n_steps = save_timestamp_every_n_steps
         self.last_timestamp_checkpoint = last_checkpoint
-        self.step_counter = 0
+        self.rollout_counter = 0
+        self.num_timesteps = 0
 
         self.checkpoint_file = os.path.join(model_dir, "checkpoint.json")
         self.data_collected_file = f"data_collected_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
 
     def _on_step(self) -> bool:
+        self.num_timesteps += 1
         return True
 
     def _on_rollout_end(self) -> None:
-        self.step_counter += 1
-        if self.step_counter >= self.n_steps:
+        self.rollout_counter += 1
+        if self.rollout_counter >= self.n_steps:
             self._save_checkpoint()
-            self.step_counter = 0
+            self.rollout_counter = 0
 
     def _on_training_end(self) -> None:
         self._save_checkpoint(final=True)
@@ -98,7 +100,7 @@ class CustomCheckpointCallback(BaseCallback):
 
     def _update_checkpoint_file(self) -> None:
         timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.last_checkpoint_value += self.n_steps
+        self.last_checkpoint_value += self.num_timesteps
         checkpoint_data = {
             "timesteps_trained": int(self.last_checkpoint_value),
             "last_save_time": timestamp_str

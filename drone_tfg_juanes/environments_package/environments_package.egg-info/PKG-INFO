@@ -1,5 +1,6 @@
-Metadata-Version: 2.1
-Name: environments-package
+Metadata-Version: 2.4
+Name: environments_package
 Version: 1.0
 Requires-Dist: numpy
 Requires-Dist: gymnasium
+Dynamic: requires-dist
