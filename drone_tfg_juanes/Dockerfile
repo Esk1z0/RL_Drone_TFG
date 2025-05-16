@@ -27,6 +27,10 @@ RUN pip install -r configs/requirements_config/requirements.txt
 # Instalar los paquetes locales en modo editable
 RUN pip install -e .
 RUN pip install -e ./simulation_package/controllers/xyz_controller/robot_library
+RUN pip install -e ./environments_package
+
+ENV PYTHONPATH="${PYTHONPATH}:/home/drone_tfg_juanes/simulation_package/controllers/xyz_controller/robot_library"
+
 
 # Añadir argumento y variable de entorno
 ARG MODE=train

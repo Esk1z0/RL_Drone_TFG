@@ -29,7 +29,7 @@ class CustomCheckpointCallback(BaseCallback):
     Callback personalizado para guardar modelos, logs y checkpoint de timesteps periódicamente.
 
     Guarda:
-    - El modelo principal ('model.zip' o 'model_final.zip').
+    - El modelo principal ('model.zip' o 'case1_model.zip').
     - Un archivo CSV de progreso ('progress.csv') renombrado.
     - Un archivo JSON con los timesteps acumulados.
     - Un modelo adicional con timestamp, si ha pasado suficiente tiempo.
