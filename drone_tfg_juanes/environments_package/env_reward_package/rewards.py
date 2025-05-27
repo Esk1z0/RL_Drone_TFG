@@ -5,6 +5,7 @@ from .reward_dir.reward_timer import RewardTimer
 
 from .reward_dir.reward_use_motors import RewardUseMotors
 from .reward_dir.reward_motor_penalty import RewardMotorInactivityPenalty
+from .reward_dir.reward_no_roll_simplified import RewardNoRollSimplified
 
 reward_dict = {
     str(RewardStrategyInterface.class_name()): RewardStrategyInterface,
@@ -12,5 +13,6 @@ reward_dict = {
     str(RewardTimer.class_name()): RewardTimer,
     str(RewardUseMotors.class_name()): RewardUseMotors,
     str(RewardForwardDistance.class_name()): RewardForwardDistance,
-    str(RewardMotorInactivityPenalty.class_name()): RewardMotorInactivityPenalty
+    str(RewardMotorInactivityPenalty.class_name()): RewardMotorInactivityPenalty,
+    str(RewardNoRollSimplified.class_name()): RewardNoRollSimplified
 }

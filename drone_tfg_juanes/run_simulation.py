@@ -26,7 +26,7 @@ def parse_args():
     parser.add_argument(
         "--mode",
         choices=["train", "eval"],
-        default="eval",
+        default="train",
         help="Modo de ejecución: 'train' para entrenar, 'eval' para evaluar el modelo."
     )
     return parser.parse_args()
