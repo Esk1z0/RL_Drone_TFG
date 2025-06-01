@@ -43,9 +43,9 @@ def make_env(world_path, reward_json_path, no_render):
             no_render=no_render
         )
         # Aplicamos los wrappers necesarios al entorno
-        env = RemoveKeyObservationWrapper(env, remove_keys=["gps"])
+        env = RemoveKeyObservationWrapper(env, remove_keys=["gps", "neck_1_sensor", "neck_2_sensor", "pelvis_sensor"])
         env = ScaleActionWrapper(env)
-        env = FixHeadNeckActionWrapper(env, fixed_values={12: 0.0, 13: -1, 14: 0.0})
+        env = FixHeadNeckActionWrapper(env, fixed_values={12: 0.0, 13: -1, 14: 0.0, 15: 0.0})
         return env
     return _init
 
