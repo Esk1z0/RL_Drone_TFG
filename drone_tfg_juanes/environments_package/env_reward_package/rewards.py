@@ -9,6 +9,7 @@ from .reward_dir.reward_no_roll_simplified import RewardNoRollSimplified
 from .reward_dir.reward_forward_delta import RewardForwardDistanceDelta
 from .reward_dir.reward_forward_with_penalty import RewardForwardWithPenalty
 from .reward_dir.reward_stay_upright import RewardStayUpright
+from .reward_dir.reward_position_debug import RewardPrintPosition
 
 reward_dict = {
     str(RewardStrategyInterface.class_name()): RewardStrategyInterface,
@@ -20,5 +21,6 @@ reward_dict = {
     str(RewardNoRollSimplified.class_name()): RewardNoRollSimplified,
     str(RewardForwardDistanceDelta.class_name()): RewardForwardDistanceDelta,
     str(RewardForwardWithPenalty.class_name()): RewardForwardWithPenalty,
-    str(RewardStayUpright.class_name()): RewardStayUpright
+    str(RewardStayUpright.class_name()): RewardStayUpright,
+    str(RewardPrintPosition.class_name()): RewardPrintPosition
 }

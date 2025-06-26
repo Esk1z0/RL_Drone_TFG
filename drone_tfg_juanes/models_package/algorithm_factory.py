@@ -58,7 +58,10 @@ class RLModelFactory:
         os.makedirs(self.data_dir, exist_ok=True)
         os.makedirs(self.model_dir, exist_ok=True)
 
-        self.model_path = os.path.join(self.model_dir, "model.zip")
+        final_model = os.path.join(self.model_dir, "model_final.zip")
+        default_model = os.path.join(self.model_dir, "model.zip")
+        self.model_path = final_model if os.path.exists(final_model) else default_model
+
         self.checkpoint_path = os.path.join(self.model_dir, "checkpoint.json")
 
     def _load_checkpoint(self) -> None:

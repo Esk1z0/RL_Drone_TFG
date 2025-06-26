@@ -15,7 +15,7 @@ from robot_library.shared_memory_communication import Comm
 from manager import get_uid
 
 
-class DroneServer:
+class RobotServer:
     def call_uid(self, pid):
         for _ in range(5):
             uid = get_uid(pid)
@@ -143,7 +143,7 @@ class DroneServer:
 
 
 if __name__ == '__main__':
-    server = DroneServer()
+    server = RobotServer()
     try:
         print("Simulation Starting")
         server.enable_everything()

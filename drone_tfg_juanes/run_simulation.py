@@ -84,7 +84,7 @@ def evaluate_model(model, env):
     total_reward = 0
 
     while not done:
-        action, _ = model.predict(obs, deterministic=True)
+        action, _ = model.predict(obs)#, deterministic=True)
         obs, reward, terminated, truncated = env.step(action)
 
         done = any(terminated) or any(t.get("TimeLimit.truncated", False) for t in truncated)
