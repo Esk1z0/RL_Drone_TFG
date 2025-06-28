@@ -95,6 +95,10 @@ class RobotServer:
                 elif sensor == "gps":
                     # Estos sensores retornan un vector de valores.
                     observations[sensor] = np.array(device.getValues(), dtype=np.float32)
+                elif sensor == "compass":
+                    compass = device.getValues()
+                    theta = np.arctan2(compass[1], compass[0])
+                    observations[sensor] = np.array([np.cos(theta), np.sin(theta)], dtype=np.float32)
                 else:
                     # Para el resto se asume un único valor.
                     observations[sensor] = np.array([device.getValue()], dtype=np.float32)

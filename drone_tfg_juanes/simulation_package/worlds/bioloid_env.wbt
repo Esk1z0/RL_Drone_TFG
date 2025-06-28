@@ -9,8 +9,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.17393130453156097 0.29238338610980535 0.9403509221726291 1.1281202274173419
-  position -51.02434095749762 -51.935666250639784 1.0280769886711951
+  orientation -0.17543067395865958 0.26392338360515133 0.9484558641396122 1.2225770557246742
+  position -50.833834184310874 -52.02533072695612 1.0280769886711951
   follow "BioloidDog"
 }
 TexturedBackground {
@@ -30,6 +30,9 @@ BioloidDog {
   supervisor TRUE
   synchronization FALSE
   extensionSlot [
+    Compass {
+      zAxis FALSE
+    }
     Accelerometer {
     }
     InertialUnit {

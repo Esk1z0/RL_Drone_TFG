@@ -20,7 +20,8 @@ SENSORS = ["back_left_1_sensor",
            "neck_2_sensor",
            "pelvis_sensor",
            "inertial unit",
-           "gps"]
+           "gps",
+           "compass"]
 
 ACTUATORS = ["back_left_1",
              "back_left_2",

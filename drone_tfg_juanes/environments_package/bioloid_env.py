@@ -34,7 +34,8 @@ class BioloidEnv(Env):
             "neck_2_sensor": spaces.Box(low=-3.14, high=3.14, shape=(1,), dtype=np.float32),
             "pelvis_sensor": spaces.Box(low=-3.14, high=3.14, shape=(1,), dtype=np.float32),
             "inertial unit": spaces.Box(low=-1, high=1, shape=(4,), dtype=np.float32),
-            "gps": spaces.Box(low=-np.inf, high=np.inf, shape=(3,), dtype=np.float32)
+            "gps": spaces.Box(low=-np.inf, high=np.inf, shape=(3,), dtype=np.float32),
+            "compass": spaces.Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float32)
         })
 
         low = np.full((16,), -3.14, dtype=np.float32)
